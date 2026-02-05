@@ -65,8 +65,8 @@ def start_update_homebrew_cron_job(_: Setting) -> ErrorMsg:
     return run_launch_agent(homebrew_job_path)
 
 
-def start_mtapi_backend_daemon(_: Setting) -> ErrorMsg:
-    mtapi_job_path = Path("~/Library/LaunchAgents/archer.mtapi.daemon.plist")
+def start_server_backend_daemon(_: Setting) -> ErrorMsg:
+    mtapi_job_path = Path("~/Library/LaunchAgents/archer.server.daemon.plist")
     return run_launch_agent(mtapi_job_path)
 
 
@@ -231,20 +231,20 @@ settings: list[Setting] = [
         [Platform.MACOS],
     ),
     Setting(
-        "Build MTAPI Fontend",
+        "Build Client",
         [],
         build_mtapi_frontend,
     ),
     Setting(
-        "Clone MTAPI and start Daemon",
+        "Start Server Daemon",
         [
             MoveFile(
-                Path("daemon_configs/generated/archer.mtapi.daemon.plist"),
-                Path("~/Library/LaunchAgents/archer.mtapi.daemon.plist"),
+                Path("daemon_configs/generated/archer.server.daemon.plist"),
+                Path("~/Library/LaunchAgents/archer.server.daemon.plist"),
                 skip_callback_if_no_change=False,
             ),
         ],
-        start_mtapi_backend_daemon,
+        start_server_backend_daemon,
         [Platform.MACOS],
     ),
     Setting(

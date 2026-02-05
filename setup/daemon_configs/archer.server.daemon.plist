@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>archer.mtapi.daemon</string>
+    <string>archer.server.daemon</string>
     <key>ProgramArguments</key>
     <array>
         <string>/bin/zsh</string>
@@ -15,10 +15,10 @@
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/tmp/mtapi.out</string>
+    <string>/tmp/server.out</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/mtapi.err</string>
+    <string>/tmp/server.err</string>
     <key>WorkingDirectory</key>
-    <string>$CHOME/mta_backend/</string>
+    <string>$CHOME/server/</string>
 </dict>
 </plist>
