@@ -1,0 +1,60 @@
+echo "Running .archer_profile"
+set -o vi
+
+alias ls='ls -F'
+alias la='ls -la'
+alias haskell-language-server='haskell-language-server-9.10'
+alias batcat='bat'
+alias python='python3.14'
+alias pip='pip3.14'
+alias gl='git log --all --decorate --oneline --graph'
+alias indent='gindent -kr -i4'
+alias mv='mv -n'
+alias grin='grep -rin'
+alias 8='ping 8.8.8.8'
+alias swagger='npx open-swagger-ui --open'
+alias du-pretty='du -s --si'
+alias r='remote.sh'
+alias last-download='ls -t ~/Downloads | head -n1'
+
+export PATH="$HOME/code/AScripts:$PATH"
+export PATH="/usr/local/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/code/bin/:$PATH"
+export PATH="$HOME/code/bin/generated/:$PATH"
+
+# MACOS ONLY
+if [[ "$(uname -s)" == "Darwin" ]]; then
+	alias grep='ggrep -P --color=always'
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+	export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
+	export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
+	export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+	export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+	export PATH="/usr/libexec/:$PATH"
+	export PATH="$HOME/.ghcup/bin/:$PATH"
+	export PATH="$HOME/.local/bin:$PATH"
+	export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+	export PATH="/opt/homebrew/opt/llvm@17/bin:$PATH"
+	# Created by `pipx` on 2024-10-05 21:10:15
+	# export PATH="$PATH:/Users/archerheffern/.local/bin"
+	export CXX="/opt/homebrew/bin/g++-14"
+	export CC="/opt/homebrew/bin/g++-14"
+	export CC="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/gcc-14"
+	export CXX="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14"
+# ELSE
+else
+	alias fd='fdfind'
+	alias grep='grep -P --color=always'
+fi
+
+CARGO_ENV="$HOME/.cargo/env"
+if [[ -e $CARGO_ENV ]]; then
+	source $CARGO_ENV
+fi
+
+PS1='\w \$ '
+
+# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#   exec tmux
+# fi

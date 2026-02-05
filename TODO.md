@@ -1,0 +1,6 @@
+- Integrate AScripts
+- Unified dotenv
+- Hashed secrets solution
+- Versioning system for my dotfiles
+- MTA backend should be a unified backend for all my needs
+- Maybe I should also have a unified frontend
