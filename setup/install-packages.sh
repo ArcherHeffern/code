@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-CROSS_PLATFORM_PACKAGES=('sl' 'bat' 'tree' 'jq' 'fzf' 'cloc' 'ffmpeg' 'imagemagick' 'yt-dlp' 'neofetch' 'zoxide' 'tmux' 'npm')
+CROSS_PLATFORM_PACKAGES=('sl' 'bat' 'tree' 'jq' 'fzf' 'cloc' 'ffmpeg' 'imagemagick' 'yt-dlp' 'neofetch' 'zoxide' 'tmux' 'npm' 'maven' 'neo4j')
 MACOS_PACKAGES=('fd' 'ggrep' 'openjdk')
 LINUX_PACKAGES=('fd-find' 'net-tools' 'zip' 'zoxide' 'default-jre' 'default-jdk' 'presenterm')
 

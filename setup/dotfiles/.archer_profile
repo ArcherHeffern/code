@@ -15,13 +15,16 @@ alias 8='ping 8.8.8.8'
 alias swagger='npx open-swagger-ui --open'
 alias du-pretty='du -s --si'
 alias r='remote.sh'
-alias last-download='ls -t ~/Downloads | head -n1'
+alias last-download='ls -t ~/Downloads | head -n1 | xargs -J % printf "~/Downloads/%s\n" %'
+alias setup='(cd ~/code/setup/ && uv run main.py)'
 
 export PATH="$HOME/code/AScripts:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/code/bin/:$PATH"
 export PATH="$HOME/code/bin/generated/:$PATH"
+
+export NEO4J_HOME='/Users/archerheffern/code/db/database'
 
 # MACOS ONLY
 if [[ "$(uname -s)" == "Darwin" ]]; then

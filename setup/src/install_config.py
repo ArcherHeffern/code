@@ -20,6 +20,11 @@ CHOME = Path("~/code").expanduser()
 # - We will need to keep track of instances of recompiling
 
 
+def create_neo4j(_: Setting) -> ErrorMsg: 
+    symlink_data = "ln -s /opt/homebrew/var/neo4j/data /Users/archerheffern/code/db/database/data"
+    ...
+
+
 def build_client(_: Setting) -> ErrorMsg:
     if prompt_yn("Compile Client? "):
         src = Path("../client").resolve()
@@ -263,5 +268,10 @@ settings: list[Setting] = [
         ],
         create_file_hosting_daemon,
         [Platform.MACOS],
+    ),
+    Setting(
+        "Setup neo4j",
+        [],
+        create_neo4j,
     ),
 ]
