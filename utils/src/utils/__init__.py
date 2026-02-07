@@ -1,2 +1,6 @@
-def hello() -> str:
-    return "Hello from utils!"
+# from . import crypto
+from . import crypto
+
+
+def hello():
+    print("Hello")
