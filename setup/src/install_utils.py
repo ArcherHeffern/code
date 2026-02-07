@@ -60,7 +60,7 @@ class GitStatus:
     staged_modified_files: list[Path] = field(default_factory=list[Path])
     staged_deleted_files: list[Path] = field(default_factory=list[Path])
     ignored_files: list[Path] = field(default_factory=list[Path])
-    stash: list[str] = field(default_factory=list)
+    stash: list[str] = field(default_factory=list[str])
 
     def synced_with_remote(self) -> bool:
         return not (
@@ -94,6 +94,9 @@ class GitStatus:
 {"\n".join(str(f) for f in self.ignored_files)}
 {ANSI_UNDERLINE}Stash files:{ANSI_CLEAR_FORMATTING}
 {"\n".join(str(f) for f in self.stash)}"""
+
+
+def directory_has_changes(path: Path) -> bool: ...
 
 
 def git_status(repo: Path) -> Optional[GitStatus]:
@@ -175,7 +178,7 @@ def have_same_directory_contents(src: Path, dest: Path) -> bool:
     return True
 
 
-def eprint(msg: str, red=False):
+def eprint(msg: str, red: bool = False):
     if red:
         print(f"\033[91m{msg}\033[0m", file=stderr)
     else:

@@ -14,10 +14,15 @@ from src.install_utils import get_effective_user_id, exists_on_path, prompt_yn
 # TODO: Check if self is synced with remote
 CHOME = Path("~/code").expanduser()
 
+# Util to only compile if there are differences
+# - Check if there are current changed files in a directory
+# - Check if there were any changes to target dir in diff history within a timezone
+# - We will need to keep track of instances of recompiling
 
-def build_mtapi_frontend(_: Setting) -> ErrorMsg:
-    if prompt_yn("Compile chrome home page? "):
-        src = Path("../chrome_home_page").resolve()
+
+def build_client(_: Setting) -> ErrorMsg:
+    if prompt_yn("Compile Client? "):
+        src = Path("../client").resolve()
         run(["npm", "run", "build"], cwd=src)
 
 
@@ -233,7 +238,7 @@ settings: list[Setting] = [
     Setting(
         "Build Client",
         [],
-        build_mtapi_frontend,
+        build_client,
     ),
     Setting(
         "Start Server Daemon",

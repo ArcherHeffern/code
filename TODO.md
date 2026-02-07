@@ -6,3 +6,5 @@
 - Maybe I should also have a unified frontend
 - Integrate install-packages.sh with main program
 - Migrate client to use file system router
+- Global database (Hashed, Python codegen)
+- Detect if there were no changes and skip asking to compile
