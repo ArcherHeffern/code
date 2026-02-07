@@ -25,7 +25,7 @@ from src.mtapi.mtapi import (
 import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 app = FastAPI()
 
@@ -326,7 +326,7 @@ ROUTE_MAP: dict[str, Route] = {
 def compute_when_to_leave(
     train_arrival_time: datetime, walking_time_seconds: float
 ) -> datetime:
-    return train_arrival_time - timedelta(walking_time_seconds)
+    return train_arrival_time - timedelta(seconds=walking_time_seconds, minutes=1)
 
 
 @app.get("/by-location/renderable")
@@ -348,47 +348,52 @@ def by_location_renderable(lat: float, lng: float) -> CloseTrains:
         if nearby_station["last_update"] > last_updated:
             last_updated = nearby_station["last_update"]
 
-        for direction, train in [
-            ("N", nearby_station["northbound_trains"][0]),
-            ("S", nearby_station["southbound_trains"][0]),
+        for direction, trains in [
+            ("N", nearby_station["northbound_trains"]),
+            ("S", nearby_station["southbound_trains"]),
         ]:
-            route = train["name"]
-            if route not in ROUTE_MAP:
-                raise HTTPException(
-                    500, f"Route '{train["name"]}' not found in ROUTE_TO_COLOR_MAP"
-                )
-            route_data = ROUTE_MAP[route]
-            route_color = route_data.color
+            # Find the soonest train I can make
+            for train in trains:
+                route = train["name"]
+                if route not in ROUTE_MAP:
+                    raise HTTPException(
+                        500, f"Route '{train["name"]}' not found in ROUTE_TO_COLOR_MAP"
+                    )
+                route_data = ROUTE_MAP[route]
+                route_color = route_data.color
 
-            final_stop = (
-                route_data.final_northbound_stop
-                if direction == "N"
-                else route_data.final_southbound_stop
-            )
-            walking_time = walking_times[station_index]
-            if walking_time:
-                walking_time_seconds = walking_time.duration.total_seconds()
-                when_to_leave = compute_when_to_leave(
-                    train["time"], walking_time_seconds
+                final_stop = (
+                    route_data.final_northbound_stop
+                    if direction == "N"
+                    else route_data.final_southbound_stop
                 )
-            else:
-                walking_time_seconds = None
-                when_to_leave = None
+                walking_time = walking_times[station_index]
+                if walking_time:
+                    walking_time_seconds = walking_time.duration.total_seconds()
+                    when_to_leave = compute_when_to_leave(
+                        train["time"], walking_time_seconds
+                    )
+                else:
+                    walking_time_seconds = None
+                    when_to_leave = None
 
-            close_train = CloseTrain(
-                id=CloseTrain.get_id(route, direction),
-                route=route,
-                route_color=route_color,
-                direction=direction,
-                final_stop=final_stop,
-                train_arrival_time=train["time"],
-                walking_distance_meters=(
-                    walking_time.distance_meters if walking_time else None
-                ),
-                walking_time_seconds=walking_time_seconds,
-                when_to_leave=when_to_leave,
-            )
-            close_trains.append(close_train)
+                if not when_to_leave or when_to_leave < datetime.now(timezone.utc):
+                    continue
+
+                close_train = CloseTrain(
+                    id=CloseTrain.get_id(route, direction),
+                    route=route,
+                    route_color=route_color,
+                    direction=direction,
+                    final_stop=final_stop,
+                    train_arrival_time=train["time"],
+                    walking_distance_meters=(
+                        walking_time.distance_meters if walking_time else None
+                    ),
+                    walking_time_seconds=walking_time_seconds,
+                    when_to_leave=when_to_leave,
+                )
+                close_trains.append(close_train)
 
     # TODO: Order by relevence
 
