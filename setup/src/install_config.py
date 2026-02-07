@@ -9,7 +9,9 @@ from src.install_types import (
     Setting,
     Platform,
 )
-from src.install_utils import get_effective_user_id, exists_on_path, prompt_yn
+from utils.macos import get_effective_user_id
+from utils.files import exists_on_path
+from utils.common import prompt_yn
 
 # TODO: Check if self is synced with remote
 CHOME = Path("~/code").expanduser()
@@ -20,9 +22,7 @@ CHOME = Path("~/code").expanduser()
 # - We will need to keep track of instances of recompiling
 
 
-def create_neo4j(_: Setting) -> ErrorMsg: 
-    symlink_data = "ln -s /opt/homebrew/var/neo4j/data /Users/archerheffern/code/db/database/data"
-    ...
+def create_neo4j(_: Setting) -> ErrorMsg: ...
 
 
 def build_client(_: Setting) -> ErrorMsg:

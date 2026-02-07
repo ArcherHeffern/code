@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 from typing import Callable, Iterable, Optional, TypeAlias
+from utils.common import Platform
 
 
 ErrorMsg: TypeAlias = str | None
@@ -14,13 +15,6 @@ class GitRepo(str): ...
 Src: TypeAlias = Path | GitRepo
 Callback: TypeAlias = Callable[["Setting"], ErrorMsg]
 Dest: TypeAlias = Path
-
-
-class Platform(Enum):
-    MACOS = "MacOS"
-    WINDOWS = "Windows"
-    LINUX = "Linux"
-    UNKNOWN = "Unknown"
 
 
 @dataclass

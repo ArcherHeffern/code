@@ -5,16 +5,10 @@ from stat import S_IFMT
 from shutil import copy, copytree, rmtree
 
 from src.install_types import Dest, GitRepo, MoveDir, MoveFile, Setting, Src
-from src.install_utils import (
-    ANSI_CLEAR_FORMATTING,
-    ANSI_UNDERLINE,
-    eprint,
-    get_platform,
-    git_status,
-    have_same_directory_contents,
-    have_same_file_contents,
-    prompt_yn,
-)
+from utils.common import eprint, get_platform, prompt_yn
+from utils.constants import ANSI_CLEAR_FORMATTING, ANSI_UNDERLINE
+from utils.git import git_status
+from utils.files import have_same_directory_contents, have_same_file_contents
 from src.install_config import settings
 
 # TODO: User should be able to update this repo with changes to dest files
@@ -115,7 +109,7 @@ def install():
     for setting in settings:
         if setting.platform is not None and get_platform() not in setting.platform:
             print(
-                f"Skipping {setting.name}. Intended for {",".join([p.value for p in setting.platform])}"
+                f"Skipping {setting.name}. Intended for {",".join([str(p.value) for p in setting.platform])}"
             )
             continue
         print(f"{ANSI_UNDERLINE}Running {setting.name}{ANSI_CLEAR_FORMATTING}")
