@@ -15,8 +15,10 @@ alias 8='ping 8.8.8.8'
 alias swagger='npx open-swagger-ui --open'
 alias du-pretty='du -s --si'
 alias r='remote.sh'
-alias last-download='ls -t ~/Downloads | head -n1 | xargs -J % printf "~/Downloads/%s\n" %'
 alias setup='(cd ~/code/setup/ && uv run main.py)'
+alias abspath='realpath'
+alias last-download='ls -t ~/Downloads | head -n1 | xargs -J  % printf "$HOME/Downloads/%s\n" %'
+alias get-last-download='mv "$(last-download)" .'
 
 export PATH="$HOME/code/AScripts:$PATH"
 export PATH="/usr/local/bin:$PATH"
