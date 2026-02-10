@@ -17,7 +17,7 @@ alias du-pretty='du -s --si'
 alias r='remote.sh'
 alias setup='(cd ~/code/setup/ && uv run main.py)'
 alias abspath='realpath'
-alias last-download='ls -t ~/Downloads | head -n1 | xargs -J  % printf "$HOME/Downloads/%s\n" %'
+alias last-download='ls -t ~/Downloads | head -n1 | xargs -0 -J  % printf "$HOME/Downloads/%s" %'
 alias get-last-download='mv "$(last-download)" .'
 
 export PATH="$HOME/code/AScripts:$PATH"

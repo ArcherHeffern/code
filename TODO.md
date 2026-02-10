@@ -8,3 +8,5 @@
 - Migrate client to use file system router
 - Global database (Hashed, Python codegen)
 - Detect if there were no changes and skip asking to compile
+- Show recent executive orders
+- Github grep website

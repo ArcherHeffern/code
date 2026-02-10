@@ -7,3 +7,5 @@ generated
 cloned/*
 !cloned/.gitkeep
 AScripts
+target
+secrets
