@@ -1,0 +1,30 @@
+[project]
+name = "file_shredder"
+version = "0.1.1"
+description = "Python implementation of shred. Calls into port of github.com/rozbb/rust-shred using Py03"
+readme = "README.md"
+authors = [
+    { name = "ArcherHeffern", email = "heffernarcher@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+shredder = "shredder:main"
+
+[tool.maturin]
+module-name = "shredder._core"
+python-packages = ["shredder"]
+python-source = "src"
+
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[dependency-groups]
+dev = [
+    "maturin>=1.11.5",
+]
