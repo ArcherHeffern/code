@@ -1,90 +1,115 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.14
+from dataclasses import dataclass
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
-from sys import argv, exit
+from sys import exit
+from random import choices, shuffle
 from pathlib import Path
 from random import choices
-from typing import Iterable, Optional
+from argparse import ArgumentParser
 
-USAGE = """
-password_generator.py [password_length]
-
-About: 
-Generates a password. Requires at least one lowercase, uppercase, digit, and punctuation each.
-- Default length = 25
-- Regenerates password if a word in your local unix words list strictly longer than 4 characters appears
-- password_length MUST be greater or equal to 4
-- valid characters := ascii_letters + digits + punctuation
-"""
-valid_characters = ascii_lowercase + ascii_uppercase + digits + punctuation
 WORDS_LIST_FILE = Path("/usr/share/dict/words")
-MIN_PASSWORD_LENGTH = 4  # Must be min 4 because we need 1 lowercase, 1 uppercase, 1 digit, and 1 punctuation character
 
 
-def has_intersection[T](s: set[T], i: Iterable[T]) -> bool:
-    return len(s.intersection(i)) > 0
+@dataclass
+class PasswordConfig:
+    length: int
+    digit_count: int
+    uppercase_count: int
+    lowercase_count: int
+    special_count: int
 
 
-def read_words_file(filename: Path, filter_length: Optional[int]) -> list[str]:
-    """
-    Args:
-        filename (Path): Words list file
-        filter_length (Optional[int]): Remove words where len(word) <= filter_length
+def parse_args() -> PasswordConfig:
+    parser = ArgumentParser(description="sum the integers at the command line")
+    parser.add_argument(
+        "-d",
+        "--digits",
+        type=int,
+        help="Mininum number of digits or 0 if disabled",
+        default=4,
+        metavar="COUNT",
+    )
+    parser.add_argument(
+        "--lowercase",
+        type=int,
+        help="Mininum number of lowercase characters or 0 if disabled",
+        default=4,
+        metavar="COUNT",
+    )
+    parser.add_argument(
+        "--uppercase",
+        type=int,
+        help="Mininum number of uppercase characters or 0 if disabled",
+        default=4,
+        metavar="COUNT",
+    )
+    parser.add_argument(
+        "-s",
+        "--special",
+        type=int,
+        help="Mininum number of special characters or 0 if disabled",
+        default=8,
+        metavar="COUNT",
+    )
+    parser.add_argument(
+        "-l",
+        "--length",
+        type=int,
+        help="Length of password",
+        default=20,
+        metavar="COUNT",
+    )
+    args = parser.parse_args()
+    return PasswordConfig(
+        length=args.length,
+        digit_count=args.digits,
+        lowercase_count=args.lowercase,
+        uppercase_count=args.uppercase,
+        special_count=args.special,
+    )
 
-    Returns:
-        list[str]: Words in words list
-    """
-    words: list[str] = []
-    if not filename.is_file():
-        return words
-    with open(filename) as f:
-        for line in f:
-            cleaned_line = line.strip()
-            if filter_length and len(cleaned_line) <= filter_length:
-                continue
-            words.append(cleaned_line)
-    return words
 
+def generate_password(config: PasswordConfig) -> str:
+    password: list[str] = []
 
-def generate_password(length: int) -> str:
-    return "".join(choices(valid_characters, k=length))
+    password.extend(choices(ascii_lowercase, k=config.lowercase_count))
+    password.extend(choices(ascii_uppercase, k=config.uppercase_count))
+    password.extend(choices(digits, k=config.digit_count))
+    password.extend(choices(punctuation, k=config.special_count))
 
+    valid_chars = ""
+    if config.lowercase_count:
+        valid_chars += ascii_lowercase
+    if config.uppercase_count:
+        valid_chars += ascii_uppercase
+    if config.digit_count:
+        valid_chars += digits
+    if config.special_count:
+        valid_chars += punctuation
+    password.extend(
+        choices(
+            valid_chars,
+            k=config.length
+            - config.lowercase_count
+            - config.uppercase_count
+            - config.digit_count
+            - config.special_count,
+        )
+    )
+    shuffle(password)
 
-def valid_password(password: str) -> bool:
-    password_set: set[str] = set(password)
-    if not has_intersection(password_set, ascii_lowercase):
-        return False
-    if not has_intersection(password_set, ascii_uppercase):
-        return False
-    if not has_intersection(password_set, digits):
-        return False
-    if not has_intersection(password_set, punctuation):
-        return False
-    return True
-
-
-def password_contains_word(password: str, words: list[str]) -> bool:
-    for word in words:
-        if word in password:
-            return True
-    return False
+    return "".join(password)
 
 
 if __name__ == "__main__":
-    opt_password_length = 25
-    if len(argv) == 2:
-        if argv[1] in ["-h", "-help", "--help"]:
-            print(USAGE)
-            exit(0)
-        if not argv[1].isdigit():
-            print(f"Expected password length to be digit but found '{argv[1]}'.")
-            exit(1)
-        opt_password_length = int(argv[1])
-    if opt_password_length < 4:
-        print(f"Expected password_length >= 4")
+    args = parse_args()
+    if (
+        args.lowercase_count
+        + args.uppercase_count
+        + args.digit_count
+        + args.special_count
+        > args.length
+    ):
+        print("length is shorter than required lowercase+uppercase+digits+special")
         exit(1)
-    words = read_words_file(WORDS_LIST_FILE, 4)
-    while True:
-        password = generate_password(opt_password_length)
-        if valid_password(password) and not password_contains_word(password, words):
-            break
-    print(password)
+    print(generate_password(args))

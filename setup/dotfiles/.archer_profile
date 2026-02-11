@@ -25,6 +25,7 @@ export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/code/bin/:$PATH"
 export PATH="$HOME/code/bin/generated/:$PATH"
+export PATH="$HOME/code/scripts/:$PATH"
 
 export NEO4J_HOME='/Users/archerheffern/code/db/database'
 
