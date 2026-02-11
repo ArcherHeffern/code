@@ -3,10 +3,14 @@ from random import SystemRandom
 from dataclasses import dataclass
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 from sys import exit
-from random import choices
-from random import choices
+from secrets import choice
 from argparse import ArgumentParser
 from typing import Optional
+from _typeshed import SupportsLenAndGetItem
+
+
+def choices[T](population: SupportsLenAndGetItem[T], *, k: int = 1) -> list[T]:
+    return list(choice(population) for _ in range(k))
 
 
 @dataclass
