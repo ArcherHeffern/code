@@ -5,8 +5,12 @@ from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 from sys import exit
 from secrets import choice
 from argparse import ArgumentParser
-from typing import Optional
-from _typeshed import SupportsLenAndGetItem
+from typing import Optional, Protocol
+
+
+class SupportsLenAndGetItem[T](Protocol):
+    def __len__(self) -> int: ...
+    def __getitem__(self, k: int, /) -> T: ...
 
 
 def choices[T](population: SupportsLenAndGetItem[T], *, k: int = 1) -> list[T]:
