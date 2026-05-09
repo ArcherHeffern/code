@@ -1,6 +1,7 @@
 echo "Running .archer_profile"
 set -o vi
 
+alias p='python3.14'
 alias ls='ls -F'
 alias la='ls -la'
 alias haskell-language-server='haskell-language-server-9.10'
@@ -18,6 +19,8 @@ alias r='remote.sh'
 alias setup='(cd ~/code/setup/ && uv run main.py)'
 alias abspath='realpath'
 alias last-download='ls -t ~/Downloads | head -n1 | xargs -0 -J  % printf "$HOME/Downloads/%s" %'
+alias last-screenshot='ls -t ~/screenshots | head -n1 | xargs -0 -J  % printf "$HOME/screenshots/%s" %'
+alias last-file='ls -t | head -n1 | xargs -0 -J  % printf "%s" %'
 alias get-last-download='mv "$(last-download)" .'
 
 export PATH="$HOME/code/AScripts:$PATH"
@@ -44,10 +47,10 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 	export PATH="/opt/homebrew/opt/llvm@17/bin:$PATH"
 	# Created by `pipx` on 2024-10-05 21:10:15
 	# export PATH="$PATH:/Users/archerheffern/.local/bin"
-	export CXX="/opt/homebrew/bin/g++-14"
-	export CC="/opt/homebrew/bin/g++-14"
-	export CC="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/gcc-14"
-	export CXX="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14"
+	# export CXX="/opt/homebrew/bin/g++-14"
+	# export CC="/opt/homebrew/bin/g++-14"
+	# export CC="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/gcc-14"
+	# export CXX="/opt/homebrew/Cellar/gcc/14.2.0_1/bin/g++-14"
 # ELSE
 else
 	alias fd='fdfind'
