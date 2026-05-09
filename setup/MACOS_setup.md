@@ -49,9 +49,14 @@
 - Go to definition : Ctrl-i
 - Go back : Ctrl-o
 - Show or Focus Hover (editor.action.showHover) : Shift-K
+- Disable AI features (chat.disableAIFeatures)
 - View: Show changes : Cmd-shift-i (Open git)
 - Window: Confirm before close : Keybind only
 - Files: Readonly Include : 
 * `**/generated/**/*`
 * `**/dist/**/*`
 * `**/.venv/**/*`
+- View: Open Previous Editor: Ctrl-H
+- View: Open Next Editor: Ctrl-L
+- Terminal: Focus Next Terminal Group: Ctrl-J (Remove first terminal focus condition)
+- Terminal: Focus Previous Terminal Group: Ctrl-K WHEN (Remove first terminal focus condition)
