@@ -10,3 +10,7 @@ def shred(
     zero: bool,
     verbose: bool,
 ) -> bool: ...
+def shred_dir(
+    path: Path,
+    verbose: bool,
+) -> bool: ...

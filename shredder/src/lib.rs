@@ -58,6 +58,27 @@ mod _core {
         true
     }
 
+    #[pyfunction]
+    fn shred_dir(path: PathBuf, verbose: bool) -> bool {
+        let args: Vec<String> = env::args().collect();
+        let prog_name: String = Path::new(&args[0]).filename_str();
+        let logger = ShredLogger::new(&prog_name, verbose);
+        logger.print_file("removing");
+
+        let p2 = match wipe_name(&path, &logger) {
+            Ok(p2) => p2,
+            Err(_) => return false,
+        };
+
+        if remove_dir(&p2).is_err() {
+            return false;
+        }
+
+        logger.print_file_verbose("removed");
+
+        true
+    }
+
     /*
      * TODO:
      * MAKE FASTER
@@ -772,6 +793,12 @@ mod _core {
         }
 
         Err(ShredError::NameExhaustion)
+    }
+
+    fn remove_dir(path: &Path) -> Result<(), ShredError> {
+        fs::remove_dir(path)
+            .map(|_| ())
+            .map_err(|e| ShredError::RemoveErr(format!("{}", e)))
     }
 
     fn remove_file(path: &Path) -> Result<(), ShredError> {

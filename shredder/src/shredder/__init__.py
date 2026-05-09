@@ -1,2 +1,1 @@
-from shredder._core import shred
-
+from impl import shred, shred_dir
