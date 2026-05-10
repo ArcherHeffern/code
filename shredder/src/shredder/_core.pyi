@@ -12,5 +12,6 @@ def shred(
 ) -> bool: ...
 def shred_dir(
     path: Path,
+    remove: bool,
     verbose: bool,
 ) -> bool: ...

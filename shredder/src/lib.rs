@@ -41,7 +41,7 @@ mod _core {
         }
 
         if remove {
-            logger.print_file("removing");
+            logger.print_file("removing file");
 
             let p2 = match wipe_name(&path, &logger) {
                 Ok(p2) => p2,
@@ -59,22 +59,24 @@ mod _core {
     }
 
     #[pyfunction]
-    fn shred_dir(path: PathBuf, verbose: bool) -> bool {
+    fn shred_dir(path: PathBuf, remove: bool, verbose: bool) -> bool {
         let args: Vec<String> = env::args().collect();
         let prog_name: String = Path::new(&args[0]).filename_str();
         let logger = ShredLogger::new(&prog_name, verbose);
-        logger.print_file("removing");
+        logger.print_file("removing dir");
 
         let p2 = match wipe_name(&path, &logger) {
             Ok(p2) => p2,
             Err(_) => return false,
         };
 
-        if remove_dir(&p2).is_err() {
-            return false;
-        }
+        if remove {
+            if remove_dir(&p2).is_err() {
+                return false;
+            }
 
-        logger.print_file_verbose("removed");
+            logger.print_file_verbose("removed");
+        } 
 
         true
     }
@@ -605,6 +607,9 @@ mod _core {
 
         // Errors if the file type is not shreddable
         let metadata = get_metadata(&file)?;
+        if metadata.size == 0 {
+            return Ok(());
+        }
 
         // Fill up our pass sequence
 

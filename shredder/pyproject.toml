@@ -7,7 +7,9 @@ authors = [
     { name = "ArcherHeffern", email = "heffernarcher@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "utils",
+]
 
 [project.scripts]
 shredder = "shredder:main"
@@ -19,6 +21,9 @@ python-source = "src"
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
+
+[tool.uv.sources]
+utils = { path = "../utils" }
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]

@@ -1,1 +1,1 @@
-from impl import shred, shred_dir
+from shredder.impl import shred, shred_dir

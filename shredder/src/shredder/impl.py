@@ -45,18 +45,18 @@ def shred_dir(
     zero: bool = True,
     verbose: bool = False,
 ):
-    for dir_path, _, filenames in walk(path, topdown=False):
+    for dir_path, dirnames, filenames in walk(path, topdown=False):
         for file in filenames:
             f = Path(join(dir_path, file))
-            if f.is_dir():
-                _shred_dir(f, verbose)
-            else:
-                shred(
-                    f,
-                    n_passes,
-                    remove,
-                    size,
-                    exact,
-                    zero,
-                    verbose,
-                )
+            _shred(
+                f,
+                n_passes,
+                remove,
+                size,
+                exact,
+                zero,
+                verbose,
+            )
+        for dirname in dirnames:
+            f = Path(join(dir_path, dirname))
+            _shred_dir(f, remove, verbose)
