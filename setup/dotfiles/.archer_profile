@@ -1,6 +1,8 @@
 echo "Running .archer_profile"
 set -o vi
 
+alias shred='shred --no-confirm'
+alias shredr='fd -t file -0 . | xargs -J{} -0 shred --no-confirm "{}"'
 alias p='python3.14'
 alias ls='ls -F'
 alias la='ls -la'
@@ -67,3 +69,7 @@ PS1='\w \$ '
 # if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
 #   exec tmux
 # fi
+
+echo "Shredding Bash History"
+shred ~/.bash_history*
+echo "Done Shredding Bash History"
