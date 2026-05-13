@@ -16,6 +16,7 @@ use std::{
     io::{self, BufWriter, Seek, Write},
     path::{self, Path, PathBuf},
 };
+use walkdir::{DirEntry, WalkDir};
 
 use rand::{TryRng, rngs::ThreadRng, seq::SliceRandom};
 
@@ -56,11 +57,28 @@ pub fn shred(
     true
 }
 
-pub fn shred_dir(path: PathBuf, remove: bool, verbose: bool) -> bool {
+// TODO: Shred metadata
+// TODO: Handle other file types
+pub fn shred_dir(path: PathBuf, remove: bool, verbose: bool, recursive: bool) -> bool {
     let args: Vec<String> = env::args().collect();
     let prog_name: String = Path::new(&args[0]).filename_str();
     let mut logger = ShredLogger::new(&prog_name, verbose);
     logger.set_filename(path.to_str().get_or_insert("FILENAME"));
+
+    if recursive {
+        for entry in WalkDir::new(&path)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|e| e.file_type().is_file() || e.file_type().is_dir())
+        {
+            let p = PathBuf::from(entry.path());
+            if entry.file_type().is_dir() {
+                shred_dir(p, remove, verbose, true);
+            } else if entry.file_type().is_file() {
+                shred(p, 10, remove, None, true, true, verbose);
+            }
+        }
+    }
 
     let p2 = match wipe_name(&path, &logger) {
         Ok(p2) => p2,

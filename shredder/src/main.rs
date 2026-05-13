@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use clap::Parser;
 
 use crate::shredder::{shred, shred_dir};
+use walkdir::DirEntry;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -16,6 +17,9 @@ struct Args {
 
     #[arg(short, long, default_value_t = false)]
     verbose: bool,
+
+    #[arg(short, long, default_value_t = false)]
+    recursive: bool,
 }
 fn main() {
     let args = Args::parse();
@@ -29,7 +33,7 @@ fn main() {
             eprintln!("Path {p:?} does not exist");
         } else if p.is_dir() {
             println!("Shredding directory {p:?}");
-            if !shred_dir(p.clone(), args.remove, args.verbose) {
+            if !shred_dir(p.clone(), args.remove, args.verbose, args.recursive) {
                 eprintln!("Failed to shred directory {p:?}");
             }
         } else if p.is_file() {
