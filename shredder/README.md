@@ -15,3 +15,5 @@ I suggest reading [NIST Special Publication 800 NIST SP 800-88r2](https://doi.or
 
 If privacy is a true goal of yours, You'd be far better off switching to operating systems like TAILS or Qubes. 
 
+## Note to self
+`cargo install --path .` for local install 

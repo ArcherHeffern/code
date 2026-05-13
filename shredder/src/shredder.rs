@@ -30,14 +30,15 @@ pub fn shred(
 ) -> bool {
     let args: Vec<String> = env::args().collect();
     let prog_name: String = Path::new(&args[0]).filename_str();
-    let logger = ShredLogger::new(&prog_name, verbose);
+    let mut logger = ShredLogger::new(&prog_name, verbose);
+    logger.set_filename(path.to_str().get_or_insert("FILENAME"));
     if let Err(e) = wipe_file(&path, n_passes, size, exact, zero, &logger) {
         logger.print_err(e);
         return false;
     }
 
     if remove {
-        logger.print_file("removing file");
+        logger.print_file_verbose("removing file");
 
         let p2 = match wipe_name(&path, &logger) {
             Ok(p2) => p2,
@@ -45,7 +46,7 @@ pub fn shred(
         };
 
         if remove_file(&p2).is_err() {
-            logger.print_file_verbose("Failed to remove dir");
+            logger.print_file_verbose("Failed to remove file");
             return false;
         }
 
@@ -58,8 +59,8 @@ pub fn shred(
 pub fn shred_dir(path: PathBuf, remove: bool, verbose: bool) -> bool {
     let args: Vec<String> = env::args().collect();
     let prog_name: String = Path::new(&args[0]).filename_str();
-    let logger = ShredLogger::new(&prog_name, verbose);
-    logger.print_file("removing dir");
+    let mut logger = ShredLogger::new(&prog_name, verbose);
+    logger.set_filename(path.to_str().get_or_insert("FILENAME"));
 
     let p2 = match wipe_name(&path, &logger) {
         Ok(p2) => p2,
@@ -67,6 +68,7 @@ pub fn shred_dir(path: PathBuf, remove: bool, verbose: bool) -> bool {
     };
 
     if remove {
+        logger.print_file_verbose("removing dir");
         if remove_dir(&p2).is_err() {
             logger.print_file_verbose("Failed to remove dir");
             return false;
