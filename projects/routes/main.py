@@ -75,13 +75,13 @@ async def graph_for_route(
 
 
 def plot_heatmap(title: str, x: list[int], y: list[float], results: list[list[float]]):
-    fig = px.imshow(
+    fig = px.imshow( # type: ignore
         results,
         title=title,
         labels=dict(x="People Online", y="Success %", color="Revenue"),
         x=x,
         y=y,
-    )  # type: ignore
+    ) 
     fig.show()  # type: ignore
 
 
