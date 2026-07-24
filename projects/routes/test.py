@@ -3,11 +3,10 @@ import unittest
 
 from main import ROUTES, GlobalRunData, Modifier, Route, RouteData
 
+
 class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
-    async def test_up_and_back(self): 
-        global_state = GlobalRunData(
-            timedelta(minutes=1, seconds=7), 1000
-        )
+    async def test_up_and_back(self):
+        global_state = GlobalRunData(timedelta(minutes=1, seconds=7), 1000)
         route = ROUTES[Route.UP_AND_BACK]
         run_data = RouteData(
             route=route,
@@ -30,10 +29,8 @@ class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
 
         self.assertAlmostEqual(revenue, 10758.96, places=2)
 
-    async def test_stargazer(self): 
-        global_state = GlobalRunData(
-            timedelta(minutes=1, seconds=7), 1000
-        )
+    async def test_stargazer(self):
+        global_state = GlobalRunData(timedelta(minutes=1, seconds=7), 1000)
         route = ROUTES[Route.STARGAZER]
         run_data = RouteData(
             route=route,
@@ -57,5 +54,6 @@ class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
 
         self.assertAlmostEqual(revenue, 64154.48, places=2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

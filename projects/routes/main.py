@@ -2,11 +2,15 @@ from statistics import mean
 import asyncio
 from asyncio import run
 from typing import Coroutine
-import plotly.express as px # type: ignore
+import plotly.express as px  # type: ignore
 import numpy as np
 
 from constants import GlobalRunData, Modifier, RouteData
-from user_data import IRealRouteDataAggregator, RealRouteDataAggregator, await_get_best_case_route_config
+from user_data import (
+    IRealRouteDataAggregator,
+    RealRouteDataAggregator,
+    await_get_best_case_route_config,
+)
 from valuers import RouteImplData, async_get_ticket_value, get_run_value
 
 """
@@ -30,20 +34,28 @@ TODO
 
 """
 
-async def graph_for_route(r: RouteData, global_state: GlobalRunData, aggregator: IRealRouteDataAggregator, extra_item_cost: float):
+
+async def graph_for_route(
+    r: RouteData,
+    global_state: GlobalRunData,
+    aggregator: IRealRouteDataAggregator,
+    extra_item_cost: float,
+):
     awaitables: list[Coroutine[None, None, float]] = []
     count_people_online = list(range(1, 25))
     success_rates = np.arange(50, 100.5, 0.5).tolist()
     runbox_value = 0
     for s in success_rates:
         for c in count_people_online:
-            average_run_completion_time = await aggregator.async_run_to_completion_time(r)
+            average_run_completion_time = await aggregator.async_run_to_completion_time(
+                r
+            )
             run_data = RouteImplData(
                 route=r,
                 modifier=Modifier.NO_ITEMS,
                 global_state=global_state,
                 count_people_online=c,
-                average_route_success_probability=s/100,
+                average_route_success_probability=s / 100,
                 average_route_completion_time=average_run_completion_time,
                 extra_item_costs=extra_item_cost,
             )
@@ -62,11 +74,15 @@ async def graph_for_route(r: RouteData, global_state: GlobalRunData, aggregator:
     plot_heatmap(r.route.name, count_people_online, success_rates, results)
 
 
-def plot_heatmap(
-    title: str, x: list[int], y: list[float], results: list[list[float]]
-):
-    fig = px.imshow(results, title=title, labels=dict(x="People Online", y="Success %", color="Revenue"), x=x, y=y) # type: ignore
-    fig.show() # type: ignore
+def plot_heatmap(title: str, x: list[int], y: list[float], results: list[list[float]]):
+    fig = px.imshow(
+        results,
+        title=title,
+        labels=dict(x="People Online", y="Success %", color="Revenue"),
+        x=x,
+        y=y,
+    )  # type: ignore
+    fig.show()  # type: ignore
 
 
 async def main():
@@ -97,14 +113,15 @@ async def main():
     run_value = get_run_value(global_state, routebox_value)
     print(f"Runbox Value:\t{routebox_value}")
     print(f"Run value:\t{run_value}")
-    print(f"Run rate/min:\t{run_value/global_state.average_completion_time.total_seconds()*60}")
+    print(
+        f"Run rate/min:\t{run_value / global_state.average_completion_time.total_seconds() * 60}"
+    )
     config = await await_get_best_case_route_config(global_state)
     awaitables = [c.async_ticket_value(routebox_value) for c in config.values()]
     revenues = await asyncio.gather(*awaitables)
     for route, revenue in zip(config, revenues):
         print(f"{route.name}:\t{round(revenue)}")
     print(f"Average Routebox Revenue: {mean(revenues)}")
-    
 
 
 if __name__ == "__main__":
