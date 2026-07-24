@@ -1,7 +1,7 @@
 from datetime import timedelta
 import unittest
 
-from main import ROUTES, GlobalRunData, Modifier, Route, RunData
+from main import ROUTES, GlobalRunData, Modifier, Route, RouteData
 
 class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_up_and_back(self): 
@@ -9,7 +9,7 @@ class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
             timedelta(minutes=1, seconds=7), 1000
         )
         route = ROUTES[Route.UP_AND_BACK]
-        run_data = RunData(
+        run_data = RouteData(
             route=route,
             modifier=Modifier.NO_ITEMS,
             global_state=global_state,
@@ -35,7 +35,7 @@ class IntegerArithmeticTestCase(unittest.IsolatedAsyncioTestCase):
             timedelta(minutes=1, seconds=7), 1000
         )
         route = ROUTES[Route.STARGAZER]
-        run_data = RunData(
+        run_data = RouteData(
             route=route,
             modifier=Modifier.NO_ITEMS,
             global_state=global_state,
