@@ -3,7 +3,8 @@ package frog.dptb.client.database;
 import java.util.ArrayList;
 
 public record DPTBDatabase(
-        ArrayList<RunAttempt> runCompletions,
+        ArrayList<RunAttempt> runAttempts,
         ArrayList<PlayerSnapshot> onlineSnapshots,
-        ArrayList<RouteAttempt> routeAttempts
+        ArrayList<RouteAttempt> routeAttempts,
+        ArrayList<Session> sessions
 ) {}
