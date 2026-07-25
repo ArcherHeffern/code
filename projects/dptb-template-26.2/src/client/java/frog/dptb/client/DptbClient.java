@@ -11,18 +11,20 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.slf4j.Logger;
+import net.minecraft.network.chat.Component;
 
 import static frog.dptb.Dptb.MOD_ID;
 
 /**
  * TODO:
- * * Routebox regex
- * * Route messages
- * * Storing in database
- * * Display time left util button cooldown off
- * * Revenue snapshots every minute
- * * AFK detection
- * * Start/End session
+ * - Routebox regex
+ * - Route messages
+ * - Storing in database
+ * - Display time left util button cooldown off
+ * - Revenue snapshots every minute
+ * - AFK detection
+ * - Start/End session
+ * - Display all my session stats
  */
 
 public class DptbClient implements ClientModInitializer {
