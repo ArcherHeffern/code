@@ -1,3 +1,4 @@
+from datetime import timedelta
 from statistics import mean
 import asyncio
 from asyncio import run
@@ -5,13 +6,13 @@ from typing import Coroutine
 import plotly.express as px  # type: ignore
 import numpy as np
 
-from constants import GlobalRunData, Modifier, RouteData
-from user_data import (
-    IRealRouteDataAggregator,
-    RealRouteDataAggregator,
-    await_get_best_case_route_config,
+from constants import ROUTES, GlobalRunData, Item, Modifier, Route, RouteConfig, RouteData
+from data_services import IRouteDataService, MockRouteDataService
+from optimizer_services import (
+    IRouteOptimizerService,
+    MockRouteOptimizerService,
 )
-from valuers import RouteImplData, async_get_ticket_value, get_run_value
+from valuers import RouteValueService
 
 """
 Features:
@@ -37,29 +38,46 @@ TODO
 
 async def graph_for_route(
     r: RouteData,
-    global_state: GlobalRunData,
-    aggregator: IRealRouteDataAggregator,
+    data_service_t: type[IRouteDataService],
+    optimizer_service_t: type[IRouteOptimizerService],
+    average_route_completion_time: timedelta,
     extra_item_cost: float,
 ):
+    data_service = data_service_t()
+
+    average_completion_time, average_revenue_per_completion = await asyncio.gather(
+        data_service.async_average_completion_time(),
+        data_service.async_average_completion_income(),
+    )
+
+    global_state = GlobalRunData(
+        average_completion_time, average_revenue_per_completion
+    )
     awaitables: list[Coroutine[None, None, float]] = []
     count_people_online = list(range(1, 25))
     success_rates = np.arange(50, 100.5, 0.5).tolist()
-    runbox_value = 0
+    route_configs = await optimizer_service_t(global_state).async_optimal_route_configs()
+    route_configs = list(filter(lambda _r: _r.route.route is not r.route, route_configs))
     for s in success_rates:
+        s /= 100
         for c in count_people_online:
-            average_run_completion_time = await aggregator.async_run_to_completion_time(
-                r
-            )
-            run_data = RouteImplData(
+            run_data = RouteConfig(
                 route=r,
                 modifier=Modifier.NO_ITEMS,
                 global_state=global_state,
                 count_people_online=c,
-                average_route_success_probability=s / 100,
-                average_route_completion_time=average_run_completion_time,
+                average_route_success_probability=s,
+                average_route_completion_time=average_route_completion_time,
                 extra_item_costs=extra_item_cost,
             )
-            awaitables.append(run_data.async_ticket_value(runbox_value))
+
+            # Get routebox value including the current route config
+            route_configs.append(run_data)
+            all_route_data_service = RouteValueService(global_data=global_state, route_config=route_configs)
+            routebox_value = await all_route_data_service.async_get_routebox_value()
+            route_configs.pop()
+
+            awaitables.append(run_data.async_ticket_value(routebox_value))
 
     revenues = await asyncio.gather(*awaitables)
 
@@ -84,44 +102,52 @@ def plot_heatmap(title: str, x: list[int], y: list[float], results: list[list[fl
     ) 
     fig.show()  # type: ignore
 
+async def get_optimal_data(data_service_t: type[IRouteDataService], optimizer_t: type[IRouteOptimizerService]):
+    data_service = data_service_t()
 
-async def main():
-    aggregator = RealRouteDataAggregator()
 
     average_completion_time, average_revenue_per_completion = await asyncio.gather(
-        aggregator.async_average_completion_time(),
-        aggregator.async_average_completion_income(),
+        data_service.async_average_completion_time(),
+        data_service.async_average_completion_income(),
     )
 
     global_state = GlobalRunData(
         average_completion_time, average_revenue_per_completion
     )
 
-    # Graphing Functionality
-    # route = Route.OVERLOADED
-    # r = ROUTES[route]
-    # extra_item_cost = Item.REMOTE_ACTIVATION.value * 3
-    # await graph_for_route(r, global_state, aggregator, extra_item_cost)
+    optimizer = optimizer_t(global_state)
 
-    # average_revenue_per_second = await GlobalRunData.async_average_revenue_per_second(global_state)
-    # print(f"Average revenue per minute including completions and routeboxes: \t{average_revenue_per_second*60}")
+    optimal_route_configs = await optimizer.async_optimal_route_configs()
 
-    # Best Case Numbers Functionality
     print("Best Case Numbers")
-    route_config = await await_get_best_case_route_config(global_state)
-    routebox_value = await async_get_ticket_value(global_state, route_config)
-    run_value = get_run_value(global_state, routebox_value)
+
+    all_route_data_service = RouteValueService(global_data=global_state, route_config=optimal_route_configs)
+
+    routebox_value_pre_risk_discount = await all_route_data_service.async_get_routebox_value(None)
+    routebox_value = await all_route_data_service.async_get_routebox_value()
+    run_value = await all_route_data_service.async_get_run_value()
+    print(f"Runbox Value (Pre risk discount):\t{routebox_value_pre_risk_discount}")
     print(f"Runbox Value:\t{routebox_value}")
     print(f"Run value:\t{run_value}")
     print(
         f"Run rate/min:\t{run_value / global_state.average_completion_time.total_seconds() * 60}"
     )
-    config = await await_get_best_case_route_config(global_state)
-    awaitables = [c.async_ticket_value(routebox_value) for c in config.values()]
-    revenues = await asyncio.gather(*awaitables)
-    for route, revenue in zip(config, revenues):
-        print(f"{route.name}:\t{round(revenue)}")
+    revenue_awaitables: list[Coroutine[None, None, float]] = [c.async_ticket_value(routebox_value_pre_risk_discount) for c in optimal_route_configs]
+    revenues = await asyncio.gather(*revenue_awaitables)
+    for config, revenue in zip(optimal_route_configs, revenues):
+        print(f"{config.route.route.name}:\t{round(revenue)}")
     print(f"Average Routebox Revenue: {mean(revenues)}")
+
+async def main():
+    # await get_optimal_data(MockRouteDataService, MockRouteOptimizerService)
+
+    # Graphing Functionality
+    route = Route.OVERLOADED
+    r = ROUTES[route]
+    extra_item_cost = Item.REMOTE_ACTIVATION.value * 3
+
+    await graph_for_route(r, MockRouteDataService, MockRouteOptimizerService, timedelta(minutes=4), extra_item_cost)
+
 
 
 if __name__ == "__main__":
