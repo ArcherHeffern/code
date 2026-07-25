@@ -24,4 +24,8 @@ public class RunAttempt {
 
     // Failure Data
     private int goldFromPartialConversion;
+
+    public int getRevenue() {
+        return goldFromCompletionStreak + goldFromFullConversion + totalBountyFromCompletion + goldFromPartialConversion;
+    }
 }
