@@ -35,6 +35,8 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
+	loom.log4jConfigs.from "log4j-dev.xml"
 }
 
 dependencies {
