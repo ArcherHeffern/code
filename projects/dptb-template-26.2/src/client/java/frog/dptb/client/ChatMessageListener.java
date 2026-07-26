@@ -1,6 +1,7 @@
 package frog.dptb.client;
 
 import com.mojang.authlib.GameProfile;
+import frog.dptb.client.database.DPTBContext;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -11,6 +12,8 @@ import java.time.Instant;
 
 class ChatMessageListener implements ClientReceiveMessageEvents.Chat {
 
+    private static DPTBContext CONTEXT = DPTBContext.get();
+
     private boolean isFromGod(GameProfile sender) {
         return false;
     }
@@ -18,9 +21,9 @@ class ChatMessageListener implements ClientReceiveMessageEvents.Chat {
     @Override
     public void onReceiveChatMessage(Component message, @Nullable PlayerChatMessage playerChatMessage, @Nullable GameProfile sender, ChatType.Bound boundChatType, Instant timeStamp) {
         if (playerChatMessage != null) {
-            DptbClient.LOGGER.info(Utils.stringish(sender != null ? sender.name() : "(null)") + " " + sender.id() + " " + playerChatMessage.toString());
+            CONTEXT.getLogger().info(Utils.stringish(sender != null ? sender.name() : "(null)") + " " + sender.id() + " " + playerChatMessage.toString());
         } else {
-            DptbClient.LOGGER.info("PlayerChatMessage was null");
+            CONTEXT.getLogger().info("PlayerChatMessage was null");
         }
     }
 }

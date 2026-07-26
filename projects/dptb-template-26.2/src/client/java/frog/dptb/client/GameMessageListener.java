@@ -1,17 +1,21 @@
 package frog.dptb.client;
 
+import frog.dptb.client.database.DPTBContext;
+import frog.dptb.client.database.DatabaseManager;
 import frog.dptb.client.database.RouteAttempt;
-import frog.dptb.client.database.RunAttempt;
+import frog.dptb.client.database.RunAttemptEntity;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GameMessageListener implements ClientReceiveMessageEvents.Game {
+
+    final private static DPTBContext CONTEXT = DPTBContext.get();
 
     private static final Pattern BUTTON_PRESSED_REGEX = Pattern.compile(
             "^\\* ➜ The BUTTON was pressed by (?<level>\\[[IVX-]*]) (?<username>[^!]+)!$"
@@ -35,14 +39,14 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             "^\\* You earned (?<gold>\\d+)⛂ from your bounty!$"
     );
     private static final Pattern EARNED_ROUTEBOX_REGEX = Pattern.compile(
-            "TODO"
+            "^\\* RARE DROP! You received a Routebox.*$"
     );
 
     @Override
     public void onReceiveGameMessage(Component message, boolean overlay) {
-        Logger logger = DptbClient.LOGGER;
-        Optional<RunAttempt> currentRun = DptbClient.currentRun;
-        Optional<RouteAttempt> currentRoute = DptbClient.currentRoute;
+        Logger logger = CONTEXT.getLogger();
+        Optional<RunAttemptEntity.RunAttemptEntityBuilder> currentRun = CONTEXT.getRunAttemptEntityBuilder();
+        Optional<RouteAttempt> currentRoute = CONTEXT.getCurrentRoute();
 
         String msg = message.getString();
 
@@ -71,18 +75,8 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             // TODO: Display time left until button
         } else if (runStarted) {
             logger.debug("[Run Started]");
-            DptbClient.currentRun = Optional.of(new RunAttempt(
-                    Instant.now(),
-                    Optional.empty(),
-                    false,
-                    false,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
-            ));
+            Optional<RunAttemptEntity.RunAttemptEntityBuilder> runAttemptBuilder = Optional.of(RunAttemptEntity.builder().begin(LocalDateTime.now()));
+            CONTEXT.setRunAttemptEntityBuilder(runAttemptBuilder);
         } else if (completionStreak) {
             logger.debug("[Completion Streak]");
             if (currentRun.isEmpty()) {
@@ -91,7 +85,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             }
             String strStreak = completionStreakMatcher.group("streak");
             int streak = Integer.parseInt(strStreak);
-            currentRun.get().setCompletionStreak(streak);
+            currentRun.get().completionStreak(streak);
         } else if (goldAndXpFromCompletionStreak) {
             logger.debug("[Completion Streak Gold/XP]");
             if (currentRun.isEmpty()) {
@@ -100,8 +94,8 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             }
             int gold = Integer.parseInt(goldAndXpFromCompletionStreakMatcher.group("gold"));
             int xp = Integer.parseInt(goldAndXpFromCompletionStreakMatcher.group("xp"));
-            currentRun.get().setGoldFromCompletionStreak(gold);
-            currentRun.get().setXpFromCompletionStreak(xp);
+            currentRun.get().goldFromCompletionStreak(gold);
+            currentRun.get().xpFromCompletionStreak(xp);
         } else if (convertedGoldFromCompletion) {
             logger.debug("[Converted Gold From Completion]");
             if (currentRun.isEmpty()) {
@@ -109,7 +103,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
                 return;
             }
             int gold = Integer.parseInt(convertedGoldFromCompletionMatcher.group("gold"));
-            currentRun.get().setGoldFromFullConversion(gold);
+            currentRun.get().goldFromFullConversion(gold);
         } else if (totalBountyFromCompletion) {
             logger.debug("[Total Bounty From Completion]");
             if (currentRun.isEmpty()) {
@@ -117,14 +111,14 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
                 return;
             }
             int gold = Integer.parseInt(totalBountyFromCompletionMatcher.group("gold"));
-            currentRun.get().setTotalBountyFromCompletion(gold);
-            currentRun.get().setEnd(Optional.of(Instant.now()));
-            currentRun.get().setCompleted(true);
+            currentRun.get().totalBountyFromCompletion(gold);
+            currentRun.get().end(LocalDateTime.now());
+            currentRun.get().completed(true);
 
             logger.debug("=== Completed Run! ===");
             logger.debug(currentRun.get().toString());
-            DptbClient.DATABASE.runAttempts().add(currentRun.get());
-            DptbClient.currentRun = Optional.empty();
+            DatabaseManager.persist(CONTEXT.getSessionFactory(), currentRun.get());
+            CONTEXT.setRunAttemptEntityBuilder(Optional.empty());
         } else if (bountyFromFailure) {
             logger.debug("[Bounty From Failure]");
             if (currentRun.isEmpty()) {
@@ -132,20 +126,20 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
                 return;
             }
             int gold = Integer.parseInt(bountyFromFailureMatcher.group("gold"));
-            currentRun.get().setGoldFromPartialConversion(gold);
-            currentRun.get().setEnd(Optional.of(Instant.now()));
+            currentRun.get().goldFromPartialConversion(gold);
+            currentRun.get().end(LocalDateTime.now());
 
             logger.debug("=== Failed Run. ===");
             logger.debug(currentRun.get().toString());
-            DptbClient.DATABASE.runAttempts().add(currentRun.get());
-            DptbClient.currentRun = Optional.empty();
+            DatabaseManager.persist(CONTEXT.getSessionFactory(), currentRun.get());
+            CONTEXT.setRunAttemptEntityBuilder(Optional.empty());
         } else if (earnedRoutebox) {
             logger.debug("[Earned Routebox]");
             if (currentRun.isEmpty()) {
                 logger.error("Found [Earned Routebox] event before run started");
                 return;
             }
-            currentRun.get().setEarnedRoutebox(true);
+            currentRun.get().earnedRoutebox(true);
         }
 
     }
