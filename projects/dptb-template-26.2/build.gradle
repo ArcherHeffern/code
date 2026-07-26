@@ -25,6 +25,10 @@ repositories {
 			includeGroup "maven.modrinth"
 		}
 	}
+	maven {
+		name = "AlexIIL"
+		url = "https://staging.alexiil.uk/maven/"
+	}
 }
 
 loom {
@@ -51,6 +55,7 @@ dependencies {
 	runtimeOnly "maven.modrinth:yjgIrBjZ:KKsXwobI"
 	implementation "org.hibernate.orm:hibernate-core:7.4.5.Final"
 	implementation 'com.mysql:mysql-connector-j:8.3.0'
+	implementation include("io.github.cottonmc:LibGui:17.0.0+26.2")
 }
 
 processResources {

@@ -21,6 +21,7 @@ import static frog.dptb.Dptb.MOD_ID;
  * - AFK detection
  * - Start/End session
  * - Display all my session stats
+ * - ModImplementation in build.gradle
  */
 
 public class DptbClient implements ClientModInitializer {
