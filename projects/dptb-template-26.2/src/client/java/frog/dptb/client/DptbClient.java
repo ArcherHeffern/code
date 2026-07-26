@@ -1,19 +1,21 @@
 package frog.dptb.client;
 
-import frog.dptb.client.database.DPTBDatabase;
-import frog.dptb.client.database.RouteAttempt;
-import frog.dptb.client.database.RunAttempt;
+import frog.dptb.client.database.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
 import org.slf4j.Logger;
-import net.minecraft.network.chat.Component;
 
 import static frog.dptb.Dptb.MOD_ID;
+import static java.time.LocalDateTime.now;
 
 /**
  * TODO:
@@ -45,7 +47,21 @@ public class DptbClient implements ClientModInitializer {
         LOGGER.info("Initializing Client");
         ClientReceiveMessageEvents.CHAT.register(new ChatMessageListener());
         ClientReceiveMessageEvents.GAME.register(new GameMessageListener());
+        Optional<SessionFactory> maybeSessionFactory = DatabaseManager.initialize();
+
+        if (maybeSessionFactory.isPresent()) {
+            SessionFactory sessionFactory = maybeSessionFactory.get();
+            sessionFactory.inTransaction(session -> {
+                session.persist(new PlayerSnapshot(now(), 1));
+            });
+            sessionFactory.inTransaction(session -> {
+                session.createSelectionQuery("From PlayerSnapshot", PlayerSnapshot.class).getResultList().forEach(result -> {
+                    LOGGER.info(result.toString());
+                });
+            });
+        } else {
+            LOGGER.error("SessionFactory Could not be created.");
+        }
     }
 }
-
 

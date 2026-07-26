@@ -1,5 +1,5 @@
 # gradle
-hibernate.properties
+src/main/resources/hibernate.properties
 
 .gradle/
 build/
