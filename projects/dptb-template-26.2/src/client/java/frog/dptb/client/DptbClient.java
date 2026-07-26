@@ -1,5 +1,7 @@
 package frog.dptb.client;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.resources.Identifier;
@@ -43,33 +45,44 @@ public class DptbClient implements ClientModInitializer {
         addHUDElement(
                 "button_countdown",
                 TextAlignment.LEFT,
-                0,
-                200,
+                (_width) -> 20,
+                (height) -> 20,
                 () -> {
                     Duration d = Duration.between(CONTEXT.getLastButtonPress(), LocalDateTime.now());
-                    CONTEXT.getLogger().debug(CONTEXT.getLastButtonPress().toString());
                     if (d.compareTo(Duration.ofSeconds(15)) > 0) {
-                        return "BUTTON CLICKABLE!!!";
+                        return Component.literal("BUTTON CLICKABLE.").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
                     }
-                    double totalSeconds = 15 - (d.toMillis() / 1000.0);
-                    return String.format("%.1f", totalSeconds);
+                    double secondsRemaining = 15 - (d.toMillis() / 1000.0);
+                    var f = Component.literal(String.format("%.1f", secondsRemaining));
+                    ChatFormatting formatting = ChatFormatting.GREEN;
+                    if (secondsRemaining < 7) {
+                        formatting = ChatFormatting.YELLOW;
+                    }
+                    if (secondsRemaining < 3) {
+                        formatting = ChatFormatting.RED;
+                    }
+                    return f.withStyle(formatting);
                 }
         );
 
     }
 
-    private void addHUDElement(String uniqueName, TextAlignment textAlignment, int x, int y, StringSupplier content) {
+    private void addHUDElement(String uniqueName, TextAlignment textAlignment, IntegerTransformer x, IntegerTransformer y, ComponentSupplier content) {
         HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath(CONTEXT.getModId(), uniqueName),
                 (graphics, deltaTracker) -> {
+                    var window = Minecraft.getInstance().getWindow();
+                    var width = window.getScreenWidth();
+                    var height = window.getScreenHeight();
+
                     var textRenderer = graphics.textRenderer();
                     ActiveTextCollector collector = graphics.textRenderer();
                     textRenderer.accept(
                             textAlignment,
-                            x,
-                            y,
+                            x.get(width),
+                            y.get(height),
                             collector.defaultParameters(),
-                            Component.literal(content.get())
+                            content.get()
                     );
                 }
         );
