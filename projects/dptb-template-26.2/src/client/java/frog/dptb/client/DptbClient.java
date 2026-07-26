@@ -1,17 +1,16 @@
 package frog.dptb.client;
 
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.resources.Identifier;
 import frog.dptb.client.database.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import org.hibernate.SessionFactory;
-import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.minecraft.network.chat.Component;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-
-import static frog.dptb.Dptb.MOD_ID;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * TODO:
@@ -26,7 +25,7 @@ import static frog.dptb.Dptb.MOD_ID;
 
 public class DptbClient implements ClientModInitializer {
 
-    public static DPTBContext CONTEXT = DPTBContext.get();
+    public static DPTBContext CONTEXT = DPTBContextProvider.get();
 
     @Override
     public void onInitializeClient() {
@@ -34,7 +33,48 @@ public class DptbClient implements ClientModInitializer {
         ClientReceiveMessageEvents.CHAT.register(new ChatMessageListener());
         ClientReceiveMessageEvents.GAME.register(new GameMessageListener());
 
-//        DatabaseManager.testQueries(CONTEXT);
+//        addHUDElement(
+//                "testing",
+//                TextAlignment.LEFT,
+//                0,
+//                200,
+//                () -> "Hello from MyMod"
+//        );
+        addHUDElement(
+                "button_countdown",
+                TextAlignment.LEFT,
+                0,
+                200,
+                () -> {
+                    Duration d = Duration.between(CONTEXT.getLastButtonPress(), LocalDateTime.now());
+                    CONTEXT.getLogger().debug(CONTEXT.getLastButtonPress().toString());
+                    if (d.compareTo(Duration.ofSeconds(15)) > 0) {
+                        return "BUTTON CLICKABLE!!!";
+                    }
+                    double totalSeconds = 15 - (d.toMillis() / 1000.0);
+                    return String.format("%.1f", totalSeconds);
+                }
+        );
+
+    }
+
+    private void addHUDElement(String uniqueName, TextAlignment textAlignment, int x, int y, StringSupplier content) {
+        HudElementRegistry.addLast(
+                Identifier.fromNamespaceAndPath(CONTEXT.getModId(), uniqueName),
+                (graphics, deltaTracker) -> {
+                    var textRenderer = graphics.textRenderer();
+                    ActiveTextCollector collector = graphics.textRenderer();
+                    textRenderer.accept(
+                            textAlignment,
+                            x,
+                            y,
+                            collector.defaultParameters(),
+                            Component.literal(content.get())
+                    );
+                }
+        );
+
     }
 }
+
 

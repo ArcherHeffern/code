@@ -2,6 +2,7 @@ package frog.dptb.client;
 
 import com.mojang.authlib.GameProfile;
 import frog.dptb.client.database.DPTBContext;
+import frog.dptb.client.database.DPTBContextProvider;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -12,7 +13,7 @@ import java.time.Instant;
 
 class ChatMessageListener implements ClientReceiveMessageEvents.Chat {
 
-    private static DPTBContext CONTEXT = DPTBContext.get();
+    private static DPTBContext CONTEXT = DPTBContextProvider.get();
 
     private boolean isFromGod(GameProfile sender) {
         return false;

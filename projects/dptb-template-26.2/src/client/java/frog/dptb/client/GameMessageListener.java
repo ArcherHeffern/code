@@ -1,9 +1,6 @@
 package frog.dptb.client;
 
-import frog.dptb.client.database.DPTBContext;
-import frog.dptb.client.database.DatabaseManager;
-import frog.dptb.client.database.RouteAttempt;
-import frog.dptb.client.database.RunAttemptEntity;
+import frog.dptb.client.database.*;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
@@ -15,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class GameMessageListener implements ClientReceiveMessageEvents.Game {
 
-    final private static DPTBContext CONTEXT = DPTBContext.get();
+    final private static DPTBContext CONTEXT = DPTBContextProvider.get();
 
     private static final Pattern BUTTON_PRESSED_REGEX = Pattern.compile(
             "^\\* ➜ The BUTTON was pressed by (?<level>\\[[IVX-]*]) (?<username>[^!]+)!$"
@@ -72,6 +69,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             String username = buttonPressedMatcher.group("username");
             String level = buttonPressedMatcher.group("level");
             logger.info("Button pressed by {} with level {}", username, level);
+            CONTEXT.setLastButtonPress(LocalDateTime.now());
             // TODO: Display time left until button
         } else if (runStarted) {
             logger.debug("[Run Started]");
