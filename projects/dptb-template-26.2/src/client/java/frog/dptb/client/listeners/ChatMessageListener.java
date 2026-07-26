@@ -1,8 +1,9 @@
-package frog.dptb.client;
+package frog.dptb.client.listeners;
 
 import com.mojang.authlib.GameProfile;
-import frog.dptb.client.database.DPTBContext;
-import frog.dptb.client.database.DPTBContextProvider;
+import frog.dptb.client.context.DPTBContext;
+import frog.dptb.client.context.DPTBContextProvider;
+import frog.dptb.client.utils.Utils;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
-class ChatMessageListener implements ClientReceiveMessageEvents.Chat {
+public class ChatMessageListener implements ClientReceiveMessageEvents.Chat {
 
     private static DPTBContext CONTEXT = DPTBContextProvider.get();
 

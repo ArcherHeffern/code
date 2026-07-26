@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data // Generates getters, setters, toString, equals, and hashCode
 @NoArgsConstructor // Generates a blank constructor
 @AllArgsConstructor // Generates a constructor for all fields
-public abstract class Session {
-    private Instant timestamp;
+public abstract class SessionEnt {
+    private LocalDateTime begin;
+    private LocalDateTime end;
 }

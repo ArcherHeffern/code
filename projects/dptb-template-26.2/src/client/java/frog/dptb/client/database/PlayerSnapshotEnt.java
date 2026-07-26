@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PlayerSnapshot")
-public class PlayerSnapshot {
+public class PlayerSnapshotEnt {
     @Id
     @GeneratedValue
     private Long id;
@@ -17,11 +17,11 @@ public class PlayerSnapshot {
     private LocalDateTime time;
     private int numPlayers;
 
-    public PlayerSnapshot() {
+    public PlayerSnapshotEnt() {
 
     }
 
-    public PlayerSnapshot(
+    public PlayerSnapshotEnt(
             LocalDateTime time,
             int numPlayers
     ) {

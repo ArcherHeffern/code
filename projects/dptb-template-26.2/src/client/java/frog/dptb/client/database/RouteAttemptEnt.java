@@ -3,7 +3,7 @@ package frog.dptb.client.database;
 import java.time.Duration;
 import java.time.Instant;
 
-public record RouteAttempt (
+public record RouteAttemptEnt(
     Instant begin,
     Instant end,
     boolean completed,

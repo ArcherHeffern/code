@@ -1,10 +1,10 @@
 package frog.dptb.client.database;
 
+import frog.dptb.client.context.DPTBContext;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public class DatabaseManager {
         try {
             return Optional.of(
                     new MetadataSources(registry)
-                            .addAnnotatedClass(PlayerSnapshot.class)
+                            .addAnnotatedClass(PlayerSnapshotEnt.class)
                             .buildMetadata()
                             .buildSessionFactory()
                     );
@@ -32,7 +32,7 @@ public class DatabaseManager {
 
     public static void persist(SessionFactory sessionFactory, Object o) {
         sessionFactory.inTransaction(session -> {
-            session.persist(new PlayerSnapshot(now(), 1));
+            session.persist(new PlayerSnapshotEnt(now(), 1));
         });
 
     }
@@ -40,10 +40,10 @@ public class DatabaseManager {
         public static void testQueries(DPTBContext context) {
         SessionFactory sessionFactory = context.getSessionFactory();
         sessionFactory.inTransaction(session -> {
-            session.persist(new PlayerSnapshot(now(), 1));
+            session.persist(new PlayerSnapshotEnt(now(), 1));
         });
         sessionFactory.inTransaction(session -> {
-            session.createSelectionQuery("From PlayerSnapshot", PlayerSnapshot.class).getResultList().forEach(result -> {
+            session.createSelectionQuery("From PlayerSnapshot", PlayerSnapshotEnt.class).getResultList().forEach(result -> {
                 context.getLogger().info(result.toString());
             });
         });

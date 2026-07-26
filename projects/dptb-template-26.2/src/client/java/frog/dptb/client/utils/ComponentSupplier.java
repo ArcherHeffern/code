@@ -1,4 +1,4 @@
-package frog.dptb.client;
+package frog.dptb.client.utils;
 
 import net.minecraft.network.chat.Component;
 

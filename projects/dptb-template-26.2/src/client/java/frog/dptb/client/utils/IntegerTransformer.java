@@ -1,6 +1,4 @@
-package frog.dptb.client;
-
-import net.minecraft.network.chat.Component;
+package frog.dptb.client.utils;
 
 @FunctionalInterface
 public interface IntegerTransformer {

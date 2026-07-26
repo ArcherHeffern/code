@@ -1,5 +1,6 @@
-package frog.dptb.client.database;
+package frog.dptb.client.context;
 
+import frog.dptb.client.database.DatabaseManager;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;

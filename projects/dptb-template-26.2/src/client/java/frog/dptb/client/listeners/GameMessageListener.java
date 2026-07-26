@@ -1,5 +1,7 @@
-package frog.dptb.client;
+package frog.dptb.client.listeners;
 
+import frog.dptb.client.context.DPTBContext;
+import frog.dptb.client.context.DPTBContextProvider;
 import frog.dptb.client.database.*;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.Component;
@@ -42,8 +44,8 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
     @Override
     public void onReceiveGameMessage(Component message, boolean overlay) {
         Logger logger = CONTEXT.getLogger();
-        Optional<RunAttemptEntity.RunAttemptEntityBuilder> currentRun = CONTEXT.getRunAttemptEntityBuilder();
-        Optional<RouteAttempt> currentRoute = CONTEXT.getCurrentRoute();
+        Optional<RunAttemptEnt.RunAttemptEntBuilder> currentRun = CONTEXT.getRunAttemptEntityBuilder();
+        Optional<RouteAttemptEnt> currentRoute = CONTEXT.getCurrentRoute();
 
         String msg = message.getString();
 
@@ -73,7 +75,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             // TODO: Display time left until button
         } else if (runStarted) {
             logger.debug("[Run Started]");
-            Optional<RunAttemptEntity.RunAttemptEntityBuilder> runAttemptBuilder = Optional.of(RunAttemptEntity.builder().begin(LocalDateTime.now()));
+            Optional<RunAttemptEnt.RunAttemptEntBuilder> runAttemptBuilder = Optional.of(RunAttemptEnt.builder().begin(LocalDateTime.now()));
             CONTEXT.setRunAttemptEntityBuilder(runAttemptBuilder);
         } else if (completionStreak) {
             logger.debug("[Completion Streak]");
