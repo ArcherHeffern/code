@@ -1,6 +1,5 @@
 package frog.dptb.client.utils;
 
-import frog.dptb.client.HypixelSidebarReader;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,4 +47,13 @@ public class Utils {
                 }
         ).orElse(false)).orElse(false);
     }
-}
+
+    // Returns true if left is strictly greater than right
+    public static <T extends Comparable<T>> boolean isGreaterThan(T left, T right) {
+        return left.compareTo(right) > 0;
+    }
+
+    // Returns true if left is strictly less than right
+    public static <T extends Comparable<T>> boolean isLessThan(T left, T right) {
+        return left.compareTo(right) < 0;
+    }}

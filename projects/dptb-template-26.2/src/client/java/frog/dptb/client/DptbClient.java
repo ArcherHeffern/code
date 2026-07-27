@@ -29,12 +29,18 @@ import java.util.Optional;
 
 /**
  * TODO:
- * - Route messages
+ * Metric aggregation
+ * Telemetry if I want to publish
  *
- * COMPLETE
+ * COMPLETED
  * - Display countdown until button clickable
  * - Display session statistics
  * - Session Management (AFK, joining/leaving housing, exiting Hypixel)
+ * - Stores all successful and unsuccessful User Run and Route attempts in local database (See RunAttemptEnt)
+ * - Stores Number of user online and timestamp every minute (See GameSnapshotEnt)
+ * - Metrics aren't collected when user joins until they start a run
+ * - Auto detects if user is running around at spawn (No runs started for 10 seconds) and pauses metrics. Metrics resume once they attempt a run.
+ * - Auto detects if user gets AFK'ed and pauses metrics
  */
 
 public class DptbClient implements ClientModInitializer {
@@ -58,7 +64,7 @@ public class DptbClient implements ClientModInitializer {
             () -> CONTEXT.getSession().map(
                 session -> {
                     Duration d = Duration.between(session.getLastButtonPress(), LocalDateTime.now());
-                    if (d.compareTo(Duration.ofSeconds(15)) > 0) {
+                    if (Utils.isGreaterThan(d, Duration.ofSeconds(15))) {
                         return Component.literal("BUTTON CLICKABLE.").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
                     }
                     double secondsRemaining = 15 - (d.toMillis() / 1000.0);
@@ -134,10 +140,40 @@ public class DptbClient implements ClientModInitializer {
 
             logger.debug("Leaving housing.");
             DPTBSession session = CONTEXT.getSession().get();
-            session.pause(CONTEXT.getDBsessionFactory(), false);
+            session.pause(CONTEXT.getDBsessionFactory(), Optional.empty());
+            session.setLastButtonPress(LocalDateTime.MIN);
 
             // Exiting housing ends your route, even if it hasn't started yet.
             session.setRunningRoute(false);
+        });
+
+        // If user hasn't started a run for 10 seconds - Stop Session
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            // Optimize performance by scanning every 10 ticks instead of every single tick
+            if (CONTEXT.getTickCount() != 0) return;
+            if (!Utils.isHypixel(client)) return;
+
+            CONTEXT.getSession().ifPresent((dptbSession -> {
+                if (dptbSession.isPaused()) {
+                    return;
+                }
+                if (dptbSession.getRunAttemptEntityBuilder().isPresent()) {
+                    return;
+                }
+                dptbSession.getLastRunAttempt().ifPresentOrElse(
+                        (lastRunAttempt) -> {
+                            Duration lookBack = Duration.ofSeconds(10);
+                            if (Utils.isLessThan(
+                                    Duration.between(lastRunAttempt, LocalDateTime.now()),
+                                    lookBack)
+                            ) {
+                                return;
+                            }
+                            dptbSession.pause(CONTEXT.getDBsessionFactory(), Optional.of(lookBack));
+                        },
+                        () -> dptbSession.pause(CONTEXT.getDBsessionFactory(), Optional.empty())
+                );
+            }));
         });
     }
 

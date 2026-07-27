@@ -3,6 +3,7 @@ package frog.dptb.client;
 import frog.dptb.client.context.DPTBContext;
 import frog.dptb.client.context.DPTBContextProvider;
 import frog.dptb.client.database.GameSnapshotEnt;
+import frog.dptb.client.utils.HypixelSidebarReader;
 import frog.dptb.client.utils.Utils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
@@ -37,7 +38,7 @@ public class CronService {
         });
 
         // Start the async timer loop
-        scheduler.scheduleAtFixedRate(this::asyncTimerTrigger, 1, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::asyncTimerTrigger, 1, 1, TimeUnit.MINUTES);
     }
 
     private void asyncTimerTrigger() {
@@ -46,7 +47,6 @@ public class CronService {
 
         // Jump onto the main thread to safely read the scoreboard
         client.execute(() -> {
-
             List<String> sidebar = HypixelSidebarReader.getVisualLines(client);
             int gold = -1;
             int numPlayersOnline = -1;
@@ -67,11 +67,10 @@ public class CronService {
             CONTEXT.getLogger().debug(String.format("Gold: %d: Players online: %d", gold, numPlayersOnline));
 
             if (gold != -1 && numPlayersOnline != -1) {
+                // Is this Async enough?
                 saveToDatabase(gold, numPlayersOnline);
             }
         });
-
-        // TODO: Do I need to run this async or is it already async enough?
     }
 
     private void saveToDatabase(int gold, int numPlayersOnline) {

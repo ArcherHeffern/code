@@ -20,6 +20,7 @@ public class DPTBSession {
     private int totalRevenue;
     private LocalDateTime sessionStart;
     private ArrayList<Duration> afkPeriods;
+    private Optional<LocalDateTime> lastRunAttempt;
 
     // This field is a HACK to avoid calling .build() on RunAttemptEntBuilder too early
     // We need to know if we're running a route or a run.
@@ -46,6 +47,7 @@ public class DPTBSession {
                 0,
                 LocalDateTime.now(),
                 new ArrayList<>(),
+                Optional.empty(),
                 false,
                 Optional.of(LocalDateTime.now()),
                 Optional.empty()
@@ -63,17 +65,20 @@ public class DPTBSession {
         });
     }
 
-    public void pause(SessionFactory sessionFactory, boolean isFromAFK) {
+    public boolean isPaused() {
+        return getAwayFromHousingSince().isPresent();
+    }
+
+    public void pause(SessionFactory sessionFactory, Optional<Duration> maybeStepBack) {
         getDbSessionStart().ifPresentOrElse(
                 (sessionStart) -> {
                     LocalDateTime t = LocalDateTime.now();
-                    if (isFromAFK) {
-                        t = t.minus(Duration.ofMinutes(1));
-                    }
+                    Duration stepBack = maybeStepBack.orElse(Duration.ZERO);
+                    t = t.minus(stepBack);
                     SessionEnt sessionEnt = new SessionEnt(sessionStart, t);
                     DatabaseManager.persist(sessionFactory, sessionEnt);
                     setDbSessionStart(Optional.empty());
-                    setAwayFromHousingSince(Optional.of(LocalDateTime.now().minus(Duration.ofMinutes(1))));
+                    setAwayFromHousingSince(Optional.of(t));
                 },
                 () -> {
                     throw new Error("Cannot pause session that wasn't started.");

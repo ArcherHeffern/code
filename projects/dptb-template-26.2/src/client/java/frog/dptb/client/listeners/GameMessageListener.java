@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -71,6 +72,9 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
     private static final Pattern XP_EARNED_FROM_ROUTE_REGEX = Pattern.compile(
             "^\\*   XP Earned: (?<xp>[0-9,]+) xp$"
     );
+    private static final Pattern VOLUNTARY_AFK_REGEX = Pattern.compile(
+            "^\\* Jump into the AFK portal to earn rewards while you're away!$"
+    );
 
 
     @Override
@@ -88,6 +92,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         Matcher bountyFromFailureMatcher = BOUNTY_FROM_FAILURE_REGEX.matcher(msg);
         Matcher earnedRouteboxMatcher = EARNED_ROUTEBOX_REGEX.matcher(msg);
         Matcher afkMatcher = AFK_REGEX.matcher(msg);
+        Matcher voluntaryAfkMatcher = VOLUNTARY_AFK_REGEX.matcher(msg);
         Matcher unafkMatcher = UN_AFK_REGEX.matcher(msg);
         Matcher joinedDPTBMatcher = JOINED_DPTB_REGEX.matcher(msg);
         Matcher routeModifierSelectedMatcher = ROUTE_MODIFIER_SELECTED_REGEX.matcher(msg);
@@ -106,6 +111,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         boolean bountyFromFailure = bountyFromFailureMatcher.matches();
         boolean earnedRoutebox = earnedRouteboxMatcher.matches();
         boolean afk = afkMatcher.matches();
+        boolean voluntaryAfk = voluntaryAfkMatcher.matches();
         boolean unafk = unafkMatcher.matches();
         boolean joinedDPTB = joinedDPTBMatcher.matches();
         boolean routeModifierSelected = routeModifierSelectedMatcher.matches();
@@ -151,12 +157,27 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
                         session.setRunAttemptEntityBuilder(runAttemptBuilder);
                     }
             );
+            if (session.isPaused()) {
+                session.resume();
+            }
         } else if (afk) {
             logger.debug("User is AFK. Session has been paused");
-            session.pause(CONTEXT.getDBsessionFactory(), true);
+
+            // It's possible to get AFK'ed while in the AFK room
+            if (!session.isPaused()) {
+                session.pause(CONTEXT.getDBsessionFactory(), Optional.of(Duration.ofMinutes(1)));
+            }
+        } else if (voluntaryAfk) {
+            logger.debug("User going AFK. Session has been paused");
+            // Since the user didn't get AFK'ed by the server - we don't subtract time.
+            session.pause(CONTEXT.getDBsessionFactory(), Optional.empty());
         } else if (unafk) {
             logger.debug("User is no longer AFK. Session has been resumed.");
-            session.resume();
+
+            // /spawn while at spawn prints the unafk message.
+            if (session.isPaused()) {
+                session.resume();
+            }
         } else if (joinedDPTB) {
             logger.debug("Joined Housing and have previous session");
             session.resume();
@@ -247,5 +268,6 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         session.setTotalRevenue(session.getTotalRevenue() + run.getRevenue());
         session.setRunAttemptEntityBuilder(Optional.empty());
         session.setRunningRoute(false);
+        session.setLastRunAttempt(Optional.of(LocalDateTime.now()));
     }
 }
