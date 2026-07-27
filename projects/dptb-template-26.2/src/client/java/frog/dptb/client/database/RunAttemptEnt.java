@@ -16,8 +16,10 @@ public class RunAttemptEnt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull private LocalDateTime begin;
-    @NonNull private LocalDateTime end; // Use this field to validate proper usage
+    @NonNull
+    private LocalDateTime begin;
+    @NonNull
+    private LocalDateTime end; // Use this field to validate proper usage
     private boolean completed;
 
     // Success Data
@@ -39,6 +41,6 @@ public class RunAttemptEnt {
     private int goldFromPartialConversion;
 
     public int getRevenue() {
-        return this.goldFromCompletionStreak + goldFromFullConversion + totalBountyFromCompletion + goldFromPartialConversion;
+        return this.goldFromCompletionStreak + goldFromFullConversion + totalBountyFromCompletion + goldFromPartialConversion + goldEarnedFromRoute;
     }
 }

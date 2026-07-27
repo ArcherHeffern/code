@@ -233,6 +233,8 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             int xp = Integer.parseInt(xpEarnedFromRouteMatcher.group("xp").replace(",", ""));
             runBuilder.xpEarnedFromRoute(xp);
             logger.debug(String.format("Earned %d xp from route completion", xp));
+
+            logger.debug("=== Completed Route! ===");
             finishRun(true, session, runBuilder);
         }
     }

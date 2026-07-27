@@ -11,9 +11,9 @@ public enum RouteType {
     UNKNOWN("Unknown"),
     UP_AND_BACK("Up & Back"),
     WRONG_WAY("TODO2"),
-    STARGAZER("TODO3"),
-    OVERLOADED("TODO4"),
-    MR_WOLF("TODO5");
+    STARGAZER("Stargazer"),
+    OVERLOADED("Overloaded"),
+    MR_WOLF("Mr Wolf");
 
     private final String incomingName;
 
