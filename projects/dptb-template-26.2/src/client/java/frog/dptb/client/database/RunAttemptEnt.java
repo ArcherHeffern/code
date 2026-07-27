@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor // Generates a blank constructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // Required by @Builder
 @Builder
+@Getter
 public class RunAttemptEnt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +27,13 @@ public class RunAttemptEnt {
     private int xpFromCompletionStreak;
     private int goldFromFullConversion;
     private int totalBountyFromCompletion;
+
+    // Route Data
+    private RouteType routeType;
+    private RouteModifier routeModifier;
+    private int goldEarnedFromRoute;
+    private int xpEarnedFromRoute;
+
 
     // Failure Data
     private int goldFromPartialConversion;

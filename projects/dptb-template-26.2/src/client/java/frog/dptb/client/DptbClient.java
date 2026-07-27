@@ -29,13 +29,11 @@ import java.util.Optional;
 
 /**
  * TODO:
- * - Why isn't my session being written to database?
  * - Route messages
- * - Session Statistics (Revenue/Minute, average completion length, average completion time)
  *
  * COMPLETE
  * - Display countdown until button clickable
- * - Display revenue rate metric
+ * - Display session statistics
  * - Session Management (AFK, joining/leaving housing, exiting Hypixel)
  */
 
@@ -78,16 +76,35 @@ public class DptbClient implements ClientModInitializer {
         );
 
         addHUDElement(
-                "revenue_per_minute",
+                "session_time",
                 TextAlignment.LEFT,
                 (_width) -> 20,
                 (_height) -> 40,
                 () -> CONTEXT.getSession().map(
+                        session -> {
+                            Duration duration = session.getSessionDuration();
+                            int hours = duration.toHoursPart();
+                            int minutes = duration.toMinutesPart();
+                            int seconds = duration.toSecondsPart();
+                            String isActiveMsg = session.getDbSessionStart().isPresent() ? "ACTIVE": "PAUSED";
+                            return Component.literal(String.format("[%s] %02d:%02d:%02d", isActiveMsg, hours, minutes, seconds));
+                        }
+                ).orElse(
+                        Component.empty()
+                )
+        );
+
+        addHUDElement(
+                "revenue_per_minute",
+                TextAlignment.LEFT,
+                (_width) -> 20,
+                (_height) -> 60,
+                () -> CONTEXT.getSession().map(
                     session -> {
                         Duration d = session.getSessionDuration();
                         float minutesElapsed = (float) (d.toMillis() / 1000.0 / 60);
-                        float revenuePerMinute = session.getTotalRevenue() / minutesElapsed;
-                        return Component.literal(String.format("Revenue/Minute: %.1f", revenuePerMinute));
+                        int revenuePerMinute = (int)(session.getTotalRevenue() / minutesElapsed);
+                        return Component.literal(String.format("Revenue/Minute: %d", revenuePerMinute));
                     }
                 ).orElse(Component.empty())
         );
@@ -96,7 +113,7 @@ public class DptbClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             CONTEXT.getSession().ifPresent(session -> {
                 if (Utils.isHypixel(client)) {
-                    logger.debug("Disconnecting from Hypixel");
+                    logger.debug("Disconnecting from Hypixel. Ending session.");
                     SessionEnt s = new SessionEnt(session.getDbSessionStart().get(), LocalDateTime.now());
                     DatabaseManager.persist(CONTEXT.getDBsessionFactory(), s);
                     CONTEXT.setSession(Optional.empty());
@@ -107,25 +124,20 @@ public class DptbClient implements ClientModInitializer {
         // If user exits DPTB Housing - Update session.
         // Detect leaving Housing (e.g., going back to lobby or switching games)
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.level == null || client.player == null) return;
-            if (!Utils.isHypixel(client)) return;
             // Optimize performance by scanning every 10 ticks instead of every single tick
             CONTEXT.setTickCount((CONTEXT.getTickCount() + 1) % 10);
             if (CONTEXT.getTickCount() != 0) return;
-            boolean wasInHousingForAFewSeconds = CONTEXT.getSession().map(
-                    s -> s.getDbSessionStart().map(
-                            start -> {
-                            Duration between = Duration.between(start, LocalDateTime.now());
-                            return between.compareTo(Duration.ofSeconds(5)) > 0;
-                        }
-                ).orElse(false)).orElse(false);
-            if (!wasInHousingForAFewSeconds) return;
-            boolean isInHousingNow = Utils.checkIfInDPTB(client);
-            if (isInHousingNow) return; // Maybe the scoreboard is being loaded late - meaning we then end the session early
+
+            if (!Utils.isHypixel(client)) return;
+            if (!Utils.wasOrIsInDPTB()) return;
+            if (Utils.checkIfInDPTB(client)) return;
 
             logger.debug("Leaving housing.");
             DPTBSession session = CONTEXT.getSession().get();
             session.pause(CONTEXT.getDBsessionFactory(), false);
+
+            // Exiting housing ends your route, even if it hasn't started yet.
+            session.setRunningRoute(false);
         });
     }
 

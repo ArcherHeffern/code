@@ -42,7 +42,6 @@ public class CronService {
 
     private void asyncTimerTrigger() {
         if (client == null) return;
-        if (!Utils.isHypixel(client)) return;
         if (!Utils.checkIfInDPTB(client)) return;
 
         // Jump onto the main thread to safely read the scoreboard

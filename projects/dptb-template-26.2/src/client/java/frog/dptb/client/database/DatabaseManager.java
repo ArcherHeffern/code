@@ -19,7 +19,7 @@ public class DatabaseManager {
         try {
             return Optional.of(
                     new MetadataSources(registry)
-                            .addAnnotatedClass(GameSnapshotEnt.class)
+                            .addAnnotatedClasses(GameSnapshotEnt.class, SessionEnt.class, RunAttemptEnt.class)
                             .buildMetadata()
                             .buildSessionFactory()
                     );
@@ -32,7 +32,7 @@ public class DatabaseManager {
 
     public static void persist(SessionFactory sessionFactory, Object o) {
         sessionFactory.inTransaction(session -> {
-            session.persist(new GameSnapshotEnt(now(), 1, 1));
+            session.persist(o);
         });
 
     }

@@ -1,7 +1,6 @@
 package frog.dptb.client.context;
 
 import frog.dptb.client.database.DatabaseManager;
-import frog.dptb.client.database.RouteAttemptEnt;
 import frog.dptb.client.database.RunAttemptEnt;
 import frog.dptb.client.database.SessionEnt;
 import lombok.AllArgsConstructor;
@@ -17,11 +16,14 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DPTBSession {
     private Optional<RunAttemptEnt.RunAttemptEntBuilder> runAttemptEntityBuilder;
-    private Optional<RouteAttemptEnt> currentRoute;
     private LocalDateTime lastButtonPress;
     private int totalRevenue;
     private LocalDateTime sessionStart;
     private ArrayList<Duration> afkPeriods;
+
+    // This field is a HACK to avoid calling .build() on RunAttemptEntBuilder too early
+    // We need to know if we're running a route or a run.
+    private boolean isRunningRoute;
 
     // While this class recognises AFK periods, the database will make separate sessions to exclude AFK periods
     // These two fields are mutually exclusive.
@@ -29,7 +31,8 @@ public class DPTBSession {
     private Optional<LocalDateTime> awayFromHousingSince;
 
     public Duration getSessionDuration() {
-        Duration d = Duration.between(this.getSessionStart(), LocalDateTime.now());
+        LocalDateTime recentTime = awayFromHousingSince.orElse(LocalDateTime.now());
+        Duration d = Duration.between(this.getSessionStart(), recentTime);
         for (Duration afkPeriod: this.getAfkPeriods()) {
             d = d.minus(afkPeriod);
         }
@@ -39,11 +42,11 @@ public class DPTBSession {
     public static DPTBSession initialize() {
         return new DPTBSession(
                 Optional.empty(),
-                Optional.empty(),
                 LocalDateTime.MIN,
                 0,
                 LocalDateTime.now(),
                 new ArrayList<>(),
+                false,
                 Optional.of(LocalDateTime.now()),
                 Optional.empty()
         );
@@ -70,7 +73,7 @@ public class DPTBSession {
                     SessionEnt sessionEnt = new SessionEnt(sessionStart, t);
                     DatabaseManager.persist(sessionFactory, sessionEnt);
                     setDbSessionStart(Optional.empty());
-                    setAwayFromHousingSince(Optional.of(LocalDateTime.now()));
+                    setAwayFromHousingSince(Optional.of(LocalDateTime.now().minus(Duration.ofMinutes(1))));
                 },
                 () -> {
                     throw new Error("Cannot pause session that wasn't started.");

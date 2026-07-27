@@ -1,11 +1,14 @@
 package frog.dptb.client.utils;
 
 import frog.dptb.client.HypixelSidebarReader;
-import frog.dptb.client.context.DPTBContext;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static frog.dptb.client.DptbClient.CONTEXT;
 
 public class Utils {
     public static String stringish(@Nullable String s) {
@@ -21,6 +24,8 @@ public class Utils {
     }
 
     public static boolean checkIfInDPTB(Minecraft client) {
+        if (client.level == null || client.player == null) return false;
+        if (!Utils.isHypixel(client)) return false;
         List<String> scoreboard = HypixelSidebarReader.getVisualLines(client);
         if (scoreboard.size() < 4) {
             return false;
@@ -34,4 +39,13 @@ public class Utils {
         return scoreboard.get(3).equals("by Cyborg023 [LG]");
     }
 
+    public static boolean wasOrIsInDPTB() {
+        return CONTEXT.getSession().map(
+            s -> s.getDbSessionStart().map(
+                start -> {
+                    Duration between = Duration.between(start, LocalDateTime.now());
+                    return between.compareTo(Duration.ofSeconds(5)) > 0;
+                }
+        ).orElse(false)).orElse(false);
+    }
 }
