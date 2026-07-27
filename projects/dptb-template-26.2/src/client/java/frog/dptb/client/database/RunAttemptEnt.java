@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "RunAttemptEntity")
+@Table(name = "RunAttemptEnt")
 @NoArgsConstructor // Generates a blank constructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // Required by @Builder
 @Builder
@@ -31,6 +31,6 @@ public class RunAttemptEnt {
     private int goldFromPartialConversion;
 
     public int getRevenue() {
-        return goldFromCompletionStreak + goldFromFullConversion + totalBountyFromCompletion + goldFromPartialConversion;
+        return this.goldFromCompletionStreak + goldFromFullConversion + totalBountyFromCompletion + goldFromPartialConversion;
     }
 }

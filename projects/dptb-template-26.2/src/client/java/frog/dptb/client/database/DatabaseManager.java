@@ -19,7 +19,7 @@ public class DatabaseManager {
         try {
             return Optional.of(
                     new MetadataSources(registry)
-                            .addAnnotatedClass(PlayerSnapshotEnt.class)
+                            .addAnnotatedClass(GameSnapshotEnt.class)
                             .buildMetadata()
                             .buildSessionFactory()
                     );
@@ -32,18 +32,18 @@ public class DatabaseManager {
 
     public static void persist(SessionFactory sessionFactory, Object o) {
         sessionFactory.inTransaction(session -> {
-            session.persist(new PlayerSnapshotEnt(now(), 1));
+            session.persist(new GameSnapshotEnt(now(), 1, 1));
         });
 
     }
 
         public static void testQueries(DPTBContext context) {
-        SessionFactory sessionFactory = context.getSessionFactory();
+        SessionFactory sessionFactory = context.getDBsessionFactory();
         sessionFactory.inTransaction(session -> {
-            session.persist(new PlayerSnapshotEnt(now(), 1));
+            session.persist(new GameSnapshotEnt(now(), 1, 1));
         });
         sessionFactory.inTransaction(session -> {
-            session.createSelectionQuery("From PlayerSnapshot", PlayerSnapshotEnt.class).getResultList().forEach(result -> {
+            session.createSelectionQuery("From PlayerSnapshot", GameSnapshotEnt.class).getResultList().forEach(result -> {
                 context.getLogger().info(result.toString());
             });
         });

@@ -4,28 +4,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PlayerSnapshot")
-public class PlayerSnapshotEnt {
+@NoArgsConstructor
+@Table(name = "GameSnapshotEnt")
+public class GameSnapshotEnt {
     @Id
     @GeneratedValue
     private Long id;
 
     private LocalDateTime time;
-    private int numPlayers;
+    private int playersOnline;
+    private int gold;
 
-    public PlayerSnapshotEnt() {
-
-    }
-
-    public PlayerSnapshotEnt(
+    public GameSnapshotEnt(
             LocalDateTime time,
-            int numPlayers
+            int playersOnline,
+            int gold
     ) {
         this.time = time;
-        this.numPlayers = numPlayers;
+        this.playersOnline = playersOnline;
+        this.gold = gold;
     }
 }

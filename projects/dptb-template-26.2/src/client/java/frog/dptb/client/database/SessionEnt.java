@@ -1,15 +1,23 @@
 package frog.dptb.client.database;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data // Generates getters, setters, toString, equals, and hashCode
-@NoArgsConstructor // Generates a blank constructor
-@AllArgsConstructor // Generates a constructor for all fields
-public abstract class SessionEnt {
+@Entity
+@Table(name = "SessionEnt")
+@NoArgsConstructor
+public class SessionEnt {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private LocalDateTime begin;
     private LocalDateTime end;
+
+    public SessionEnt(LocalDateTime begin, LocalDateTime end) {
+        this.begin = begin;
+        this.end = end;
+    }
 }
