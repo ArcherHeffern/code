@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static frog.dptb.client.DptbClient.CONTEXT;
 
@@ -56,4 +57,42 @@ public class Utils {
     // Returns true if left is strictly less than right
     public static <T extends Comparable<T>> boolean isLessThan(T left, T right) {
         return left.compareTo(right) < 0;
-    }}
+    }
+
+    // MAYBE_NEGATIVE_NUMBER (MAYBE_SPACES SYMBOL MAYBE_NEGATIVE_NUMBER)+
+    public static final Pattern MATH_EQUATION_REGEX = Pattern.compile(
+            "-?[0-9,]+(\\s*[+x*/-]\\s*-?[0-9,]+)+"
+    );
+
+    // Ignores order of operations
+    public static float mathSolver(String s) {
+        String[] tokens = s.replace(",", "").split("\\s+");
+        float result = Float.parseFloat(tokens[0]);
+        String op = "";
+        boolean negative = false;
+        for (int i = 1; i < tokens.length; i++) {
+            String token = tokens[i];
+            if (token.equals("-") && !op.isEmpty()) {
+                negative = true;
+            } else if ("+-/*x".contains(token)) {
+                op = token;
+            } else {
+                float number = Float.parseFloat(token);
+                if (negative) {
+                    number = number * -1;
+                }
+
+                switch (op) {
+                    case "+" -> result += number;
+                    case "-" -> result -= number;
+                    case "*", "x" -> result *= number;
+                    case "/" -> result /= number;
+                }
+
+                negative = false;
+                op = "";
+            }
+        }
+        return result;
+    }
+}

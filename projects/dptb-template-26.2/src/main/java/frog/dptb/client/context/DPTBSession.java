@@ -21,6 +21,7 @@ public class DPTBSession {
     private LocalDateTime sessionStart;
     private ArrayList<Duration> afkPeriods;
     private Optional<LocalDateTime> lastRunAttempt;
+    private Optional<Integer> mathSolution;
 
     // This field is a HACK to avoid calling .build() on RunAttemptEntBuilder too early
     // We need to know if we're running a route or a run.
@@ -47,6 +48,7 @@ public class DPTBSession {
                 0,
                 LocalDateTime.now(),
                 new ArrayList<>(),
+                Optional.empty(),
                 Optional.empty(),
                 false,
                 Optional.of(LocalDateTime.now()),

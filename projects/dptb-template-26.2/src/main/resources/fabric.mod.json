@@ -15,15 +15,11 @@
 	"icon": "assets/dptb/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"frog.dptb.Dptb"
-		],
 		"client": [
 			"frog.dptb.client.DptbClient"
 		]
 	},
 	"mixins": [
-		"dptb.mixins.json",
 		{
 			"config": "dptb.client.mixins.json",
 			"environment": "client"

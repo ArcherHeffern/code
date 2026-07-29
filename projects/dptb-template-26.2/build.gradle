@@ -32,12 +32,9 @@ repositories {
 }
 
 loom {
-	splitEnvironmentSourceSets()
-
 	mods {
 		"dptb" {
 			sourceSet sourceSets.main
-			sourceSet sourceSets.client
 		}
 	}
 

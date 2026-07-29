@@ -1,5 +1,6 @@
 package frog.dptb.client.context;
 
+import frog.dptb.client.DptbClient;
 import frog.dptb.client.database.DatabaseManager;
 import org.hibernate.SessionFactory;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ public class DPTBContextProvider {
 
     public static DPTBContext get() {
         if (context == null) {
-            String MOD_ID = frog.dptb.Dptb.MOD_ID;
+            String MOD_ID = DptbClient.MOD_ID;
             Optional<SessionFactory> maybeSessionFactory = DatabaseManager.initialize();
             maybeSessionFactory.ifPresentOrElse(sessionFactory -> {
                 context = new DPTBContext(

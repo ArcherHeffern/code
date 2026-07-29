@@ -1,10 +1,15 @@
 package frog.dptb.client.listeners;
 
+import frog.dptb.client.database.DatabaseManager;
+import frog.dptb.client.database.RouteModifier;
+import frog.dptb.client.database.RouteType;
+import frog.dptb.client.database.RunAttemptEnt;
 import frog.dptb.client.context.DPTBContext;
 import frog.dptb.client.context.DPTBContextProvider;
 import frog.dptb.client.context.DPTBSession;
-import frog.dptb.client.database.*;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 
@@ -75,6 +80,9 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
     private static final Pattern VOLUNTARY_AFK_REGEX = Pattern.compile(
             "^\\* Jump into the AFK portal to earn rewards while you're away!$"
     );
+    private static final Pattern SHOULD_CHEER_REGEX = Pattern.compile(
+            "GG! /cheer"
+    );
 
 
     @Override
@@ -100,6 +108,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         Matcher routeStartedMatcher = ROUTE_STARTED_REGEX.matcher(msg);
         Matcher goldEarnedFromRouteMatcher = GOLD_EARNED_FROM_ROUTE_REGEX.matcher(msg);
         Matcher xpEarnedFromRouteMatcher = XP_EARNED_FROM_ROUTE_REGEX.matcher(msg);
+        Matcher shouldCheerMatcher = SHOULD_CHEER_REGEX.matcher(msg);
 
 
         boolean buttonPressed = buttonPressedMatcher.matches();
@@ -119,6 +128,7 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         boolean routeStarted = routeStartedMatcher.matches();
         boolean goldEarnedFromRoute = goldEarnedFromRouteMatcher.matches();
         boolean xpEarnedFromRoute = xpEarnedFromRouteMatcher.matches();
+        boolean shouldCheer = shouldCheerMatcher.find();
 
         if (joinedDPTB && CONTEXT.getSession().isEmpty()) {
             // Detect in housing with no session
@@ -170,7 +180,9 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
         } else if (voluntaryAfk) {
             logger.debug("User going AFK. Session has been paused");
             // Since the user didn't get AFK'ed by the server - we don't subtract time.
-            session.pause(CONTEXT.getDBsessionFactory(), Optional.empty());
+            if (!session.isPaused()) {
+                session.pause(CONTEXT.getDBsessionFactory(), Optional.empty());
+            }
         } else if (unafk) {
             logger.debug("User is no longer AFK. Session has been resumed.");
 
@@ -188,6 +200,12 @@ public class GameMessageListener implements ClientReceiveMessageEvents.Game {
             session.setRunAttemptEntityBuilder(runAttemptBuilder);
             session.setRunningRoute(true);
             logger.debug(String.format("Route Modifier Selected: %s", routeModifier.name()));
+        } else if (shouldCheer) {
+            ClientPacketListener conn = Minecraft.getInstance().getConnection();
+            logger.debug("[Cheering]");
+            if (conn != null) {
+                conn.sendCommand("cheer");
+            }
         }
 
         // After this point - All messages pertain to if a run has already started
