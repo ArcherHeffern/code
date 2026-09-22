@@ -1,7 +1,11 @@
+from pathlib import Path
 from platform import system
 from sys import exit, stderr
-from typing import NoReturn
+from typing import NoReturn, Optional
 from enum import Enum, auto
+from dotenv import dotenv_values
+
+GLOBAL_DOTENV = dotenv_values(Path("~/code/.env").expanduser())
 
 
 def eprint(msg: str, red: bool = False):
@@ -45,3 +49,14 @@ def get_platform() -> Platform:
             return Platform.MACOS
         case _:
             return Platform.UNKNOWN
+
+
+def force_get_env(var: str) -> str:
+    v = get_env(var)
+    if v is None:
+        raise ValueError(f"Could not find .env value {var}")
+    return v
+
+
+def get_env(var: str) -> Optional[str]:
+    return GLOBAL_DOTENV.get(var)
