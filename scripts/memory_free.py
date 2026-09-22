@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.14
 from pathlib import Path
 from shutil import rmtree
 from subprocess import run, CompletedProcess

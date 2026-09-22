@@ -89,6 +89,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dnspython"
+version = "2.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/8b/57666417c0f90f08bcafa776861060426765fdb422eb10212086fb811d26/dnspython-2.8.0.tar.gz", hash = "sha256:181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f", size = 368251, upload-time = "2025-09-07T18:58:00.022Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/5a/18ad964b0086c6e62e2e7500f7edc89e3faa45033c71c1893d34eed2b2de/dnspython-2.8.0-py3-none-any.whl", hash = "sha256:01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af", size = 331094, upload-time = "2025-09-07T18:57:58.071Z" },
+]
+
+[[package]]
 name = "dotenv"
 version = "0.9.9"
 source = { registry = "https://pypi.org/simple" }
@@ -97,6 +106,37 @@ dependencies = [
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
+]
+
+[[package]]
+name = "email-validator"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "dnspython" },
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa450ce02fd727f452243f2e91a61af068b40adba60ea9/email_validator-2.3.0.tar.gz", hash = "sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426", size = 51238, upload-time = "2025-08-26T13:09:06.831Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
+]
+
+[[package]]
+name = "file-shredder"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/e5/46da6b140281e0c5e7ab501ab477400d9951b18fc86f7cc74b9521b508ad/file_shredder-0.1.2.tar.gz", hash = "sha256:9411f405154422b4d0e96cb32e29430ee983f7fda0cd70a99b48454dd33d7a60", size = 15446, upload-time = "2026-05-10T05:35:26.249Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/80/cd/3e39850e73dc5ed4d11c7a93fbfede5eae63e7d6b38656ebdea1c9a823c6/file_shredder-0.1.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:deb013823bc08d513d73c9c28ce77812e6e7d3d04f1e14329b13158fdf399e6c", size = 237052, upload-time = "2026-05-10T05:35:24.921Z" },
+]
+
+[[package]]
+name = "idna"
+version = "3.11"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/6d/0703ccc57f3a7233505399edb88de3cbd678da106337b9fcde432b65ed60/idna-3.11.tar.gz", hash = "sha256:795dafcc9c04ed0c1fb032c2aa73654d8e8c5023a7df64a53f39190ada629902", size = 194582, upload-time = "2025-10-12T14:55:20.501Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0e/61/66938bbb5fc52dbdf84594873d5b51fb1f7c7794e9c0f5bd885f30bc507b/idna-3.11-py3-none-any.whl", hash = "sha256:771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea", size = 71008, upload-time = "2025-10-12T14:55:18.883Z" },
 ]
 
 [[package]]
@@ -118,15 +158,32 @@ wheels = [
 ]
 
 [[package]]
+name = "python-gnupg"
+version = "0.5.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/2c/6cd2c7cff4bdbb434be5429ef6b8e96ee6b50155551361f30a1bb2ea3c1d/python_gnupg-0.5.6.tar.gz", hash = "sha256:5743e96212d38923fc19083812dc127907e44dbd3bcf0db4d657e291d3c21eac", size = 66825, upload-time = "2025-12-31T17:19:33.19Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/ab/0ea9de971caf3cd2e268d2b05dfe9883b21cfe686a59249bd2dccb4bae33/python_gnupg-0.5.6-py2.py3-none-any.whl", hash = "sha256:b5050a55663d8ab9fcc8d97556d229af337a87a3ebebd7054cbd8b7e2043394a", size = 22082, upload-time = "2025-12-31T17:16:22.743Z" },
+]
+
+[[package]]
 name = "scripts"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "email-validator" },
+    { name = "file-shredder" },
+    { name = "python-gnupg" },
     { name = "utils" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "utils", directory = "../utils" }]
+requires-dist = [
+    { name = "email-validator", specifier = ">=2.3.0" },
+    { name = "file-shredder" },
+    { name = "python-gnupg", specifier = ">=0.5.6" },
+    { name = "utils", directory = "../utils" },
+]
 
 [[package]]
 name = "utils"
