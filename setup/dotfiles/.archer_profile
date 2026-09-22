@@ -1,7 +1,7 @@
 echo "Running .archer_profile"
 set -o vi
 
-alias shred='shred --no-confirm'
+alias shred='shredder'
 alias shredr='fd -t file -0 . | xargs -J{} -0 shred --no-confirm "{}"'
 alias p='python3.14'
 alias ls='ls -F'
@@ -24,13 +24,18 @@ alias last-download='ls -t ~/Downloads | head -n1 | xargs -0 -J  % printf "$HOME
 alias last-screenshot='ls -t ~/screenshots | head -n1 | xargs -0 -J  % printf "$HOME/screenshots/%s" %'
 alias last-file='ls -t | head -n1 | xargs -0 -J  % printf "%s" %'
 alias get-last-download='mv "$(last-download)" .'
+alias ml='llama-server -hf google/gemma-4-E2B-it-qat-q4_0-gguf --ctx-size 4096 -fa on -ctk q8_0 -ctv q8_0 --reasoning-budget 0'
+alias newsboat='newsboat --refresh-on-start'
+alias ..='cd ..'
 
+export HOMEBREW_NO_ANALYTICS=1
 export PATH="$HOME/code/AScripts:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/code/bin/:$PATH"
 export PATH="$HOME/code/bin/generated/:$PATH"
 export PATH="$HOME/code/scripts/:$PATH"
+export PATH="/usr/local/mysql/bin/:$PATH"
 
 export NEO4J_HOME='/Users/archerheffern/code/db/database'
 
@@ -70,6 +75,10 @@ PS1='\w \$ '
 #   exec tmux
 # fi
 
-echo "Shredding Bash History"
-shred ~/.bash_history*
-echo "Done Shredding Bash History"
+if [ -e ~/.bash_history* ]; then
+	shred ~/.bash_history*
+else
+	echo "No Bash History...Skipping."
+fi
+
+(newsraft -e reload-all &> /dev/null&)

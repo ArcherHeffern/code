@@ -22,6 +22,7 @@ Launch vim and run `:PluginInstall`
 - Set path to 'file://~./chrome-home.html' (But expand it)
 
 # TODO
+- Install shredder with `cargo install --path .`
 - Implement MoveDir
 - Move install-packages to python script
 - Combine AScripts with this
