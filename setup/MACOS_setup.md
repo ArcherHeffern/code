@@ -13,16 +13,23 @@
 - Remove cmd-shift-f shortcut to open finder using system settings
 
 # Applications
-- Chrome
+- Firefox
 - Karabiner Elements
 - Spotify
-- Discord
 - NTFS for Mac
-- Adobe Acrobat
+- Yubico Authenticator
+- Cryptomator
+- KeePassXC
+- Signal
+- Muse
+- Mullvad
+- LuLu
+- VLC
+- Mpv
 
 # Coding
 - ITerm
-- VSCode
+- VSCodium
 - Intellij
 - Docker
 - VMWare Fusion
@@ -40,10 +47,6 @@
 - Licecap
 - KeyCastr
 
-# Chrome Settings
-- Add New tab redirect extension
-- Add http://localhost:8001/generated/chrome_home_page/index.html
-
 # VSCode Settings
 - Extensions: Vim, better comments
 - Go to definition : Ctrl-i
@@ -60,3 +63,6 @@
 - View: Open Next Editor: Ctrl-L
 - Terminal: Focus Next Terminal Group: Ctrl-J (Remove first terminal focus condition)
 - Terminal: Focus Previous Terminal Group: Ctrl-K WHEN (Remove first terminal focus condition)
+
+# Firefox About:config
+- security.webauthn.enable_macos_passkeys off
